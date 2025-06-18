@@ -100,7 +100,7 @@
     <button onclick="rollDice()">Roll Dice 🎲</button>
     <button onclick="restartGame()">Restart</button>
     <button onclick="toggleHowToPlay()">How to Play</button>
-    <p>Your element: <strong id="playerElementIndex"></strong></p>
+    <p>Your element: <strong id="playerElement"></strong></p>
     <p>Seeds left: <span id="seedsLeft">0</span></p>
   </div>
 
@@ -117,7 +117,6 @@
     const elements = ["Rain", "River", "Clouds"];
     let bowls = [0, 0, 0];
     let playerIndex = 0; // middle bowl
-    let currentIndex = 0; // start as player
     let playerElementIndex = 0;
     let seedsLeft = 0;
     let gameEnded = false;
@@ -131,7 +130,7 @@
         const countEl = document.getElementById(`count${i+1}`);
         const bowlEl = document.getElementById(`bowl${i+1}`);
 
-        emojiEl.textContent = emojis[(playerElementIndex + logical) % 3];
+        emojiEl.textContent = emojis[(playerElementIndex - logical + 3) % 3];
         countEl.textContent = bowls[logical];
         bowlEl.classList.toggle("highlight", logical === playerIndex);
       }
@@ -147,7 +146,6 @@
     function restartGame() {
       bowls = [0, 0, 0];
       playerElementIndex = 0;
-      currentIndex = 1;
       seedsLeft = 0;
       gameEnded = false;
       document.getElementById("log").innerHTML = "";
@@ -210,11 +208,19 @@ function logMessage(message) {
         
         updateBoard();
 
-        if (bowls[(currentIndex + playerIndex + 2) % 3] >= 21) {
-          logMessage("You win!");
-          gameEnded = true;
-          return;
+        for (let i = 0; i < 3; i++) {
+          if (bowls[i] >= 21) {
+            if (i === (playerIndex + 2) % 3) {
+              logMessage("You win!");
+            } else {
+              const winner = i === 0 ? "You" : i === 1 ? "Osi" : "Obasa";
+              logMessage(`${winner} wins!`);
+            }
+            gameEnded = true;
+            return;
+          }
         }
+
 
         if (seedsLeft === 0) {
           setTimeout(aiTurn, 1000);
@@ -249,7 +255,6 @@ function logMessage(message) {
 
         if (roll === 1) {
           logMessage(`${name} rolled a 1 — rotating the board`);
-          logMessage(`**You now control the ${elements[playerElementIndex]}**`);
           rotatePlayer();
           setTimeout(() => {
           if (++ai < aiIndices.length) {
