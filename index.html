@@ -146,18 +146,30 @@
       updateBoard();
     }
 
-    function logMessage(message) {
-      const log = document.getElementById("log");
-      const msg = document.createElement("div");
-      msg.textContent = "";
-      log.insertBefore(msg, log.firstChild);
+function logMessage(message) {
+  const log = document.getElementById("log");
+  const msg = document.createElement("div");
 
-      let i = 0;
-      const interval = setInterval(() => {
-        msg.textContent += message[i++];
-        if (i >= message.length) clearInterval(interval);
-      }, 30);
+  // Detect bold markers and format the message accordingly
+  if (message.startsWith("**") && message.endsWith("**")) {
+    message = message.slice(2, -2); // Remove the **
+    msg.innerHTML = `<strong></strong>`;
+  }
+
+  log.insertBefore(msg, log.firstChild);
+
+  let i = 0;
+  const interval = setInterval(() => {
+    if (msg.innerHTML === `<strong></strong>`) {
+      // Typing effect inside bold
+      msg.innerHTML = `<strong>${message.slice(0, i)}</strong>`;
+    } else {
+      msg.textContent += message[i];
     }
+    i++;
+    if (i >= message.length) clearInterval(interval);
+  }, 30);
+}
 
     function rollDice() {
       if (seedsLeft > 0 || gameEnded) return;
