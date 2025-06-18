@@ -44,8 +44,8 @@
       margin-top: 4px;
     }
     #bowl1 { bottom: 0; left: 50%; transform: translateX(-50%); }
-    #bowl2 { top: 0; left: 15px; }
-    #bowl3 { top: 0; right: 15px; }
+    #bowl2 { top: 0; right: 15px; }
+    #bowl3 { top: 0; left: 15px; }
     .controls {
       margin: 20px;
     }
@@ -252,7 +252,7 @@ function logMessage(message) {
         logMessage(`${name} rolls ${roll}`);
 
         if (roll === 1) {
-          logMessage(`${name} rolled a 1 — rotating the board`);
+          logMessage(`${name} rolled a 1`);
           rotatePlayer();
           setTimeout(() => {
           if (++ai < aiIndices.length) {
