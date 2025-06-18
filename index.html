@@ -1,244 +1,290 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Move Water Move</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f2f2f2;
-    }
-    .board {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      margin: 20px auto;
-      width: 300px;
-      height: 260px;
-    }
-    .bowl {
-      width: 150px;
-      height: 150px;
-      border: 4px solid #888;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      background-color: white;
-      font-size: 1.5em;
-      transition: background-color 0.3s, border 0.3s;
-      cursor: pointer;
-    }
-    .highlight {
-      border: 4px solid #007bff;
-    }
-    .bowl-label {
-      font-size: 0.6em;
-      margin-top: 4px;
-    }
-    #bowl1 { bottom: 0; left: 50%; transform: translateX(-50%); }
-    #bowl2 { top: 0; right: 15px; }
-    #bowl3 { top: 0; left: 15px; }
-    .controls {
-      margin: 20px;
-    }
-    #log {
-      width: 80%;
-      height: 150px;
-      margin: 20px auto;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background-color: white;
-      overflow-y: auto;
-      font-size: 0.9em;
-      display: flex;
-      flex-direction: column-reverse;
-    }
-    #howToPlay {
-      display: none;
-      position: fixed;
-      top: 10%;
-      left: 10%;
-      width: 80%;
-      background: white;
-      padding: 20px;
-      border: 2px solid #888;
-      z-index: 10;
-    }
-  </style>
-</head>
+ Here's the code for a little game I made. It currently rotates clockwise, but I'm realizing I want it to rotate counter clockwise. What code controls that?
 
-<body>
-  <h1>Move Water Move</h1>
+<!DOCTYPE html>  <html lang="en">  <head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Move Water Move</title>  
+  <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      text-align: center;  
+      background-color: #f2f2f2;  
+    }  
+.board {  
+      display: flex;  
+      justify-content: center;  
+      align-items: center;  
+      position: relative;  
+      margin: 20px auto;  
+      width: 300px;  
+      height: 260px;  
+    }  
+.bowl {  
+      width: 150px;  
+      height: 150px;  
+      border: 4px solid #888;  
+      border-radius: 50%;  
+      display: flex;  
+      flex-direction: column;  
+      justify-content: center;  
+      align-items: center;  
+      position: absolute;  
+      background-color: white;  
+      font-size: 1.5em;  
+      transition: background-color 0.3s, border 0.3s;  
+      cursor: default;  
+    }  .highlight {  
+  border: 4px solid #007bff;  
+}  
+.bowl-label {  
+  font-size: 0.6em;  
+  margin-top: 4px;  
+}  
+#bowl1 { bottom: 0; left: 50%; transform: translateX(-50%); }  
+#bowl2 { top: 0; left: 8px; }  
+#bowl3 { top: 0; right: 8px; }  
+.controls {  
+  margin: 20px;  
+}  
+#log {  
+  width: 80%;  
+  height: 150px;  
+  margin: 20px auto;  
+  padding: 10px;  
+  border: 1px solid #ccc;  
+  background-color: white;  
+  overflow-y: auto;  
+  font-size: 0.9em;  
+  display: flex;  
+  flex-direction: column-reverse;  
+}  
+#howToPlay {  
+  display: none;  
+  position: fixed;  
+  top: 10%;  
+  left: 10%;  
+  width: 80%;  
+  background: white;  
+  padding: 20px;  
+  border: 2px solid #888;  
+  z-index: 10;  
+}
 
-  <div class="board">
-    <div id="bowl1" class="bowl">
-      <div id="emoji1">☁️</div>
-      <div id="count1">0</div>
-      <div class="bowl-label">You</div>
-    </div>
-    <div id="bowl2" class="bowl">
-      <div id="emoji2">🌧️</div>
-      <div id="count2">0</div>
-      <div class="bowl-label">Obasa</div>
-    </div>
-    <div id="bowl3" class="bowl">
-      <div id="emoji3">🌊</div>
-      <div id="count3">0</div>
-      <div class="bowl-label">Osi</div>
-    </div>
-  </div>
-
-  <div class="controls">
-    <button onclick="rollDice()">Roll Dice 🎲</button>
-    <button onclick="restartGame()">Restart</button>
-    <button onclick="toggleHowToPlay()">How to Play</button>
-    <p>Your element: <strong id="playerElement"></strong></p>
-    <p>Seeds left: <span id="seedsLeft">0</span></p>
-  </div>
-
-  <div id="log"></div>
-
-  <div id="howToPlay">
-    <h3>How to Play</h3>
-    <p>Roll the dice. Add that many seeds to any bowl—yours or an opponent’s. If you roll a 1, your turn ends and the board rotates, shifting your element. The first to reach 21 seeds in their current element wins.</p>
-    <button onclick="toggleHowToPlay()">Close</button>
-  </div>
-
-  <script>
-    const emojis = ["🌧️", "🌊", "☁️"];
-    const elements = ["Rain", "River", "Clouds"];
-    let bowls = [0, 0, 0];
-    let playerIndex = 0;
-    let playerElementIndex = 2;
-    let seedsLeft = 0;
-    let gameEnded = false;
-
-    function updateBoard() {
-      const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];
-      for (let i = 0; i < 3; i++) {
-        const logical = visualToLogical[i];
-        document.getElementById(`emoji${i + 1}`).textContent = emojis[(playerElementIndex - logical + 3) % 3];
-        document.getElementById(`count${i + 1}`).textContent = bowls[logical];
-        document.getElementById(`bowl${i + 1}`).classList.toggle("highlight", logical === playerIndex);
-      }
-      document.getElementById("playerElement").textContent = elements[playerElementIndex];
-      document.getElementById("seedsLeft").textContent = seedsLeft;
-    }
-
-    function logMessage(message) {
-      const log = document.getElementById("log");
-      const msg = document.createElement("div");
-      msg.textContent = message;
-      log.insertBefore(msg, log.firstChild);
-    }
-
-    function toggleHowToPlay() {
-      const modal = document.getElementById("howToPlay");
-      modal.style.display = modal.style.display === "none" ? "block" : "none";
-    }
-
-    function restartGame() {
-      bowls = [0, 0, 0];
-      playerElementIndex = 0;
-      seedsLeft = 0;
-      gameEnded = false;
-      document.getElementById("log").innerHTML = "";
-      updateBoard();
-    }
-
-    function elementToBowlIndex(elementIndex) {
-      return (playerIndex + elementIndex) % 3;
-    }
-
-    function rollDice() {
-      if (seedsLeft > 0 || gameEnded) return;
-      const roll = Math.floor(Math.random() * 6) + 1;
-      logMessage(`You rolled a ${roll}`);
-      if (roll === 1) {
-        rotatePlayer();
-        setTimeout(aiTurn, 1000);
-        return;
-      }
-      seedsLeft = roll;
-      updateBoard();
-    }
-
-    document.querySelectorAll(".bowl").forEach((bowl, idx) => {
-      bowl.addEventListener("click", () => {
-        if (seedsLeft <= 0 || gameEnded) return;
-        const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];
-        const logicalIndex = visualToLogical[idx];
-        bowls[logicalIndex]++;
-        seedsLeft--;
-        updateBoard();
-        if (bowls[logicalIndex] >= 21) {
-          logMessage("You win!");
-          gameEnded = true;
-        } else if (seedsLeft === 0) {
-          setTimeout(aiTurn, 2500);
-        }
-      });
-    });
-
-    function rotatePlayer() {
-      playerElementIndex = (playerElementIndex + 2) % 3;
-      updateBoard();
-      logMessage(`You now control the ${elements[playerElementIndex]}`);
-    }
-
-    function aiTurn() {
-      if (gameEnded) return;
-      const aiNames = ["Osi", "Obasa"];
-      const aiIndices = [2, 0];
-      let ai = 0;
-
-      function nextAI() {
-        if (ai >= aiIndices.length) return;
-        const aiIndex = aiIndices[ai];
-        const name = aiNames[ai];
-        const elIndex = (playerElementIndex - aiIndex + 3) % 3;
-
-        const roll = Math.floor(Math.random() * 6) + 1;
-        logMessage(`${name} rolls ${roll}`);
-        if (roll === 1) {
-          logMessage(`${name} rolled a 1`);
-          rotatePlayer();
-          setTimeout(() => {
-            if (++ai < aiIndices.length) nextAI();
-          }, 2500);
-          return;
-        }
-
-        let toAdd = roll;
-        while (toAdd > 0) {
-          const randomIndex = Math.floor(Math.random() * 3);
-          const bowlIdx = elementToBowlIndex(randomIndex);
-          bowls[bowlIdx]++;
-          logMessage(`${name} placed 1 seed in ${elements[randomIndex]}`);
-          if (bowls[bowlIdx] >= 21) {
-            updateBoard();
-            logMessage(`${name} wins!`);
-            gameEnded = true;
-            return;
-          }
-          toAdd--;
-        }
-        updateBoard();
-        if (++ai < aiIndices.length) {
-          setTimeout(nextAI, 2500);
-        }
-      }
-
-      nextAI();
-    }
-
-    restartGame();
-  </script>
-</body>
+  </style>  
+</head>  <body>  
+  <h1>Move Water Move</h1>    <div class="board">  
+    <div id="bowl1" class="bowl">  
+      <div id="emoji1"></div>  
+      <div id="count1">0</div>  
+      <div class="bowl-label">You</div>  
+    </div>  
+    <div id="bowl2" class="bowl">  
+      <div id="emoji2"></div>  
+      <div id="count2">0</div>  
+      <div class="bowl-label">Osi</div>  
+    </div>  
+    <div id="bowl3" class="bowl">  
+      <div id="emoji3"></div>  
+      <div id="count3">0</div>  
+      <div class="bowl-label">Obasa</div>  
+    </div>  
+  </div>    <div class="controls">  
+    <button onclick="rollDice()">Roll Dice 🎲</button>  
+    <button onclick="restartGame()">Restart</button>  
+    <button onclick="toggleHowToPlay()">How to Play</button>  
+    <p>Your element: <strong id="playerElement"></strong></p>  
+    <p>Seeds left: <span id="seedsLeft">0</span></p>  
+  </div>    <div id="log"></div>    <div id="howToPlay">  
+    <h3>How to Play</h3>  
+    <p>Roll the dice. Add that many seeds to any bowl—yours or an opponent’s. If you roll a 1, your turn ends and the board rotates, shifting your element. The first to reach 21 seeds in their current element wins.</p>  
+    <button onclick="toggleHowToPlay()">Close</button>  
+  </div>    <script>  
+    const emojis = ["🌧️", "🌊", "☁️"];  
+    const elements = ["Rain", "River", "Clouds"];  
+    let bowls = [0, 0, 0];  
+    let playerIndex = 1; // middle bowl  
+    let currentIndex = 1; // start as player  
+    let playerElementIndex = 0;  
+    let seedsLeft = 0;  
+    let gameEnded = false;  
+  
+    function updateBoard() {  
+     const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];  
+  
+     for (let i = 0; i < 3; i++) {  
+        const logical = visualToLogical[i];  
+        const emojiEl = document.getElementById(`emoji${i+1}`);  
+        const countEl = document.getElementById(`count${i+1}`);  
+        const bowlEl = document.getElementById(`bowl${i+1}`);  
+  
+        emojiEl.textContent = emojis[(playerElementIndex + logical) % 3];  
+        countEl.textContent = bowls[logical];  
+        bowlEl.classList.toggle("highlight", logical === playerIndex);  
+      }  
+      document.getElementById("playerElement").textContent = elements[playerElementIndex];  
+      document.getElementById("seedsLeft").textContent = seedsLeft;  
+    }  
+  
+    function toggleHowToPlay() {  
+      const modal = document.getElementById("howToPlay");  
+      modal.style.display = modal.style.display === "none" ? "block" : "none";  
+    }  
+  
+    function restartGame() {  
+      bowls = [0, 0, 0];  
+      playerElementIndex = 0;  
+      currentIndex = 1;  
+      seedsLeft = 0;  
+      gameEnded = false;  
+      document.getElementById("log").innerHTML = "";  
+      updateBoard();  
+    }  
+  
+function logMessage(message) {  
+  const log = document.getElementById("log");  
+  const msg = document.createElement("div");  
+  
+  const isBold = message.startsWith("**") && message.endsWith("**");  
+  if (isBold) {  
+    message = message.slice(2, -2);  
+    msg.innerHTML = "<strong></strong>";  
+  }  
+  
+  log.insertBefore(msg, log.firstChild);  
+  
+  let i = 0;  
+  const interval = setInterval(() => {  
+    if (isBold) {  
+      const strong = msg.querySelector("strong");  
+      strong.textContent = message.slice(0, i + 1);  
+    } else {  
+      msg.textContent = message.slice(0, i + 1);  
+    }  
+    i++;  
+    if (i >= message.length) clearInterval(interval);  
+  }, 30);  
+}  
+  
+  
+    function rollDice() {  
+      if (seedsLeft > 0 || gameEnded) return;  
+  
+      const roll = Math.floor(Math.random() * 6) + 1;  
+      logMessage(`You rolled a ${roll}`);  
+  
+      if (roll === 1) {  
+        rotatePlayer();  
+        setTimeout(aiTurn, 1000); // move to AI  
+        return;  
+      }  
+  
+  
+      seedsLeft = roll;  
+      updateBoard();  
+    }  
+  
+    document.querySelectorAll(".bowl").forEach((bowl, idx) => {  
+      bowl.addEventListener("click", () => {  
+        if (seedsLeft <= 0 || gameEnded) return;  
+  
+        // Map clicked bowl to actual bowl  
+        const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];  
+        const logicalIndex = visualToLogical[idx];  
+  
+        bowls[logicalIndex]++;  
+        seedsLeft--;  
+          
+        updateBoard();  
+  
+        if (bowls[(currentIndex + playerIndex + 2) % 3] >= 21) {  
+          logMessage("You win!");  
+          gameEnded = true;  
+          return;  
+        }  
+  
+        if (seedsLeft === 0) {  
+          setTimeout(aiTurn, 1000);  
+        }  
+      });  
+    });  
+  
+    function rotatePlayer() {  
+      playerElementIndex = (playerElementIndex + 1) % 3;  
+      updateBoard();  
+      if (playerElementIndex === 0) {  
+      logMessage(`**You now control the ${elements[playerElementIndex]}**`);  
+      }  
+    }  
+  
+    function aiTurn() {  
+      if (gameEnded) return;  
+  
+      const aiNames = ["Osi", "Obasa"];  
+      const aiIndices = [0, 2];  
+  
+      let ai = 0;  
+      function nextAI() {  
+        if (ai >= aiIndices.length) return;  
+  
+        const aiIndex = aiIndices[ai];  
+        const name = aiNames[ai];  
+        const elIndex = (playerElementIndex + aiIndex + 2) % 3;  
+  
+        const roll = Math.floor(Math.random() * 6) + 1;  
+        logMessage(`${name} rolls ${roll}`);  
+  
+        if (roll === 1) {  
+          logMessage(`${name} rolled a 1 — rotating the board`);  
+          rotatePlayer();  
+          setTimeout(() => {  
+          if (++ai < aiIndices.length) {  
+            nextAI();  
+          }  
+        }, 1000);  
+          return;  
+        }  
+  
+  
+        let toAdd = roll;  
+        if (bowls[elIndex] + toAdd === 21) {  
+          bowls[elIndex] += toAdd;  
+          logMessage(`${name} placed ${toAdd} seeds in the ${elements[elIndex]}`);  
+          updateBoard();  
+          logMessage(`${name} wins!`);  
+          gameEnded = true;  
+          return;  
+        }  
+  
+        let added = [0, 0, 0];  
+        while (toAdd > 0) {  
+          const idx = Math.floor(Math.random() * 3);  
+          bowls[idx]++;  
+          added[idx]++;  
+          toAdd--;  
+        }  
+  
+        for (let i = 0; i < 3; i++) {  
+          if (added[i]) {  
+            logMessage(`${name} placed ${added[i]} seeds in the ${elements[i]}`);  
+          }  
+        }  
+  
+        updateBoard();  
+        if (bowls[elIndex] >= 21) {  
+          logMessage(`${name} wins!`);  
+          gameEnded = true;  
+          return;  
+        }  
+  
+        if (++ai < aiIndices.length) {  
+          setTimeout(nextAI, 1000);  
+        }  
+      }  
+  
+      nextAI();  
+    }  
+  
+    restartGame();  
+  </script>  
+</body>  
 </html>
