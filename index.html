@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Move Water Move</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .board {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0;
+    }
+    .bowl {
+      border: 4px solid gray;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      position: relative;
+    }
+    .highlight {
+      border-color: blue;
+    }
+    .symbol {
+      font-size: 32px;
+    }
+    .log {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+      height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      text-align: left;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #howToPlayModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #howToPlayModal .content {
+      background: white;
+      padding: 20px;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Move Water Move</h1>
+
+  <div class="board" id="board"></div>
+
+  <div>
+    <button onclick="rollDice()">Roll Dice 🎲</button>
+    <button onclick="restartGame()">Restart</button>
+    <button onclick="toggleModal()">How to Play</button>
+  </div>
+
+  <div id="playerInfo"></div>
+  <div class="log" id="log"></div>
+
+  <div id="howToPlayModal">
+    <div class="content">
+      <h2>How to Play</h2>
+      <p>You control one of the elements: Rain 🌧️, River 🌊, or Clouds ☁️.</p>
+      <p>Roll the dice. Add the rolled number of seeds to any bowls (yours or others) one at a time.</p>
+      <p>If you roll a 1, the elements rotate — you now control a different one!</p>
+      <p>The first to reach 21 seeds in their current element wins.</p>
+      <button onclick="toggleModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const elements = ["Rain", "River", "Clouds"];
+    const symbols = { Rain: "🌧️", River: "🌊", Clouds: "☁️" };
+    let playerIndex = 0;
+    let board = [0, 0, 0];
+    let dice = 0;
+    let seedsLeft = 0;
+    let logEl;
+    let playerName = "You";
+    let ais = ["Osi", "Obasa"];
+    let modal;
+
+    function rotatePlayer() {
+      playerIndex = (playerIndex + 1) % 3;
+    }
+
+    function getCurrentElement(index) {
+      return elements[(index + elementRotation) % 3];
+    }
+
+    function rollDice() {
+      if (seedsLeft > 0) return;
+      dice = Math.floor(Math.random() * 6) + 1;
+      seedsLeft = dice;
+      log(`${playerName} rolled a ${dice}`);
+      if (dice === 1) elementRotation = (elementRotation + 1) % 3;
+      updateUI();
+    }
+
+    function placeSeed(i) {
+      if (seedsLeft > 0) {
+        board[i]++;
+        seedsLeft--;
+        updateUI();
+        if (seedsLeft === 0) {
+          checkWinner();
+          setTimeout(aiTurns, 500);
+        }
+      }
+    }
+
+    function aiTurns() {
+      ais.forEach((ai, aiOffset) => {
+        const index = (playerIndex + aiOffset + 1) % 3;
+        const roll = Math.floor(Math.random() * 6) + 1;
+        log(`${ai} rolls ${roll}`);
+        if (roll === 1) elementRotation = (elementRotation + 1) % 3;
+        let remaining = roll;
+        const myEl = (index + elementRotation) % 3;
+        const plan = [0, 0, 0];
+        if (board[myEl] + roll >= 21) {
+          plan[myEl] = roll;
+        } else {
+          while (remaining > 0) {
+            const r = Math.floor(Math.random() * 3);
+            plan[r]++;
+            remaining--;
+          }
+        }
+        plan.forEach((v, i) => {
+          board[i] += v;
+          if (v > 0) log(`${ai} adds ${v} to ${elements[i]}`);
+        });
+        checkWinner();
+      });
+      rotatePlayer();
+      updateUI();
+    }
+
+    function checkWinner() {
+      board.forEach((count, i) => {
+        if (count >= 21) {
+          const winner = i === (playerIndex + elementRotation) % 3 ? playerName :
+            ((i === (playerIndex + 1 + elementRotation) % 3) ? "Osi" : "Obasa");
+          alert(`${winner} wins!`);
+        }
+      });
+    }
+
+    function restartGame() {
+      board = [0, 0, 0];
+      seedsLeft = 0;
+      elementRotation = 0;
+      logEl.textContent = "";
+      updateUI();
+    }
+
+    function log(text) {
+      logEl.textContent += text + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function toggleModal() {
+      modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+    }
+
+    function updateUI() {
+      const boardEl = document.getElementById("board");
+      boardEl.innerHTML = elements.map((el, i) => {
+        const index = (i + elementRotation) % 3;
+        const isPlayer = index === playerIndex;
+        return `<div class="bowl ${isPlayer ? "highlight" : ""}" onclick="placeSeed(${index})">
+          <div class="symbol">${symbols[el]}</div>
+          <div>${el}</div>
+          <div>${board[index]}</div>
+        </div>`;
+      }).join("");
+      document.getElementById("playerInfo").innerHTML =
+        `Your element: <b>${elements[(playerIndex + elementRotation) % 3]}</b><br>Seeds left: ${seedsLeft}`;
+    }
+
+    let elementRotation = 0;
+
+    window.onload = () => {
+      logEl = document.getElementById("log");
+      modal = document.getElementById("howToPlayModal");
+      updateUI();
+    }
+  </script>
+</body>
+</html>
