@@ -44,8 +44,8 @@
       margin-top: 4px;
     }
     #bowl1 { bottom: 0; left: 50%; transform: translateX(-50%); }
-    #bowl2 { top: 0; right: 15px; }
-    #bowl3 { top: 0; left: 15px; }
+    #bowl2 { top: 0; left: 8px; }
+    #bowl3 { top: 0; right: 8px; }
     .controls {
       margin: 20px;
     }
@@ -87,12 +87,12 @@
     <div id="bowl2" class="bowl">
       <div id="emoji2"></div>
       <div id="count2">0</div>
-      <div class="bowl-label">Obasa</div>
+      <div class="bowl-label">Osi</div>
     </div>
     <div id="bowl3" class="bowl">
       <div id="emoji3"></div>
       <div id="count3">0</div>
-      <div class="bowl-label">Osi</div>
+      <div class="bowl-label">Obasa</div>
     </div>
   </div>
 
@@ -116,13 +116,14 @@
     const emojis = ["🌧️", "🌊", "☁️"];
     const elements = ["Rain", "River", "Clouds"];
     let bowls = [0, 0, 0];
-    let playerIndex = 0; // middle bowl
-    let playerElementIndex = 2;
+    let playerIndex = 1; // middle bowl
+    let currentIndex = 1; // start as player
+    let playerElementIndex = 0;
     let seedsLeft = 0;
     let gameEnded = false;
 
     function updateBoard() {
-     const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];
+     const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];
 
      for (let i = 0; i < 3; i++) {
         const logical = visualToLogical[i];
@@ -130,7 +131,7 @@
         const countEl = document.getElementById(count${i+1});
         const bowlEl = document.getElementById(bowl${i+1});
 
-        emojiEl.textContent = emojis[(playerElementIndex - logical + 3) % 3];
+        emojiEl.textContent = emojis[(playerElementIndex + logical) % 3];
         countEl.textContent = bowls[logical];
         bowlEl.classList.toggle("highlight", logical === playerIndex);
       }
@@ -146,6 +147,7 @@
     function restartGame() {
       bowls = [0, 0, 0];
       playerElementIndex = 0;
+      currentIndex = 1;
       seedsLeft = 0;
       gameEnded = false;
       document.getElementById("log").innerHTML = "";
@@ -177,9 +179,7 @@ function logMessage(message) {
   }, 30);
 }
 
-function elementToBowlIndex(elementIndex) {
-  return (playerIndex + elementIndex) % 3;
-}
+
     function rollDice() {
       if (seedsLeft > 0 || gameEnded) return;
 
@@ -202,7 +202,7 @@ function elementToBowlIndex(elementIndex) {
         if (seedsLeft <= 0 || gameEnded) return;
 
         // Map clicked bowl to actual bowl
-        const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];
+        const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];
         const logicalIndex = visualToLogical[idx];
 
         bowls[logicalIndex]++;
@@ -210,19 +210,11 @@ function elementToBowlIndex(elementIndex) {
         
         updateBoard();
 
-        for (let i = 0; i < 3; i++) {
-          if (bowls[i] >= 21) {
-            if (i === (playerIndex + 2) % 3) {
-              logMessage("You win!");
-            } else {
-              const winner = i === 0 ? "You" : i === 1 ? "Obasa" : "Osi";
-              logMessage(${winner} wins!);
-            }
-            gameEnded = true;
-            return;
-          }
+        if (bowls[(currentIndex + playerIndex + 2) % 3] >= 21) {
+          logMessage("You win!");
+          gameEnded = true;
+          return;
         }
-
 
         if (seedsLeft === 0) {
           setTimeout(aiTurn, 1000);
@@ -231,16 +223,18 @@ function elementToBowlIndex(elementIndex) {
     });
 
     function rotatePlayer() {
-      playerElementIndex = (playerElementIndex + 2) % 3;
+      playerElementIndex = (playerElementIndex + 1) % 3;
       updateBoard();
+      if (playerElementIndex === 0) {
       logMessage(**You now control the ${elements[playerElementIndex]}**);
+      }
     }
 
     function aiTurn() {
       if (gameEnded) return;
 
       const aiNames = ["Osi", "Obasa"];
-      const aiIndices = [2, 0];
+      const aiIndices = [0, 2];
 
       let ai = 0;
       function nextAI() {
@@ -248,19 +242,19 @@ function elementToBowlIndex(elementIndex) {
 
         const aiIndex = aiIndices[ai];
         const name = aiNames[ai];
-        const elIndex = (playerElementIndex - aiIndex + 3) % 3;
+        const elIndex = (playerElementIndex + aiIndex + 2) % 3;
 
         const roll = Math.floor(Math.random() * 6) + 1;
         logMessage(${name} rolls ${roll});
 
         if (roll === 1) {
-          logMessage(${name} rolled a 1);
+          logMessage(${name} rolled a 1 — rotating the board);
           rotatePlayer();
           setTimeout(() => {
           if (++ai < aiIndices.length) {
             nextAI();
           }
-        }, 2500);
+        }, 1000);
           return;
         }
 
@@ -277,10 +271,9 @@ function elementToBowlIndex(elementIndex) {
 
         let added = [0, 0, 0];
         while (toAdd > 0) {
-          const elementIdx = Math.floor(Math.random() * 3);
-          const bowlIdx = elementToBowlIndex(elementIdx);
-          bowls[bowlIdx]++;
-          added[elementIdx]++;
+          const idx = Math.floor(Math.random() * 3);
+          bowls[idx]++;
+          added[idx]++;
           toAdd--;
         }
 
