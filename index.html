@@ -244,9 +244,6 @@ function elementToBowlIndex(elementIndex, originIndex = playerIndex) {
 
       let ai = 0;
       function nextAI() {
-        if (gameEnded) return;
-          setTimeout(nextAI, 1000);
-        }
         if (ai >= aiIndices.length) return;
 
         const aiIndex = aiIndices[ai];
