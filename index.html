@@ -5,261 +5,272 @@
   <title>Move Water Move</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 20px;
+      background-color: #f0f8ff;
     }
     h1 {
-      margin-bottom: 0.5em;
+      margin-top: 10px;
     }
-    .game-board {
+    #game {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      position: relative;
-      height: 450px;
+      margin-top: 20px;
+    }
+    #board {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
     }
     .bowl-row {
       display: flex;
-      justify-content: space-around;
-      width: 100%;
-      max-width: 400px;
-      margin-bottom: 40px;
+      justify-content: center;
+      gap: 100px;
     }
     .bowl {
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      border: 5px solid gray;
+      border: 4px solid gray;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      font-size: 24px;
+      align-items: center;
       background-color: white;
       position: relative;
+      font-size: 20px;
     }
-    .bowl.controlled {
+    .bowl.active {
       border-color: blue;
+      box-shadow: 0 0 15px blue;
     }
-    .bowl-label {
-      position: absolute;
-      bottom: -30px;
-      width: 100%;
-      text-align: center;
+    .icon {
+      font-size: 30px;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .log {
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 300px;
+      text-align: left;
+    }
+    .bold {
       font-weight: bold;
     }
     button {
-      margin: 10px;
+      margin: 5px;
       padding: 10px 20px;
-      font-size: 16px;
     }
-    #log {
-      max-height: 200px;
-      overflow-y: auto;
-      margin-top: 20px;
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: left;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
+    #modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid #000;
+      padding: 20px;
+      z-index: 1000;
     }
-    .log-entry {
-      margin: 5px 0;
-    }
-    #howToPlayModal {
+    #overlay {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
       z-index: 999;
-    }
-    #howToPlayContent {
-      background: white;
-      padding: 20px;
-      max-width: 500px;
-      border-radius: 8px;
-    }
-    #howToPlayContent button {
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Move Water Move</h1>  <div class="game-board">
-    <div class="bowl-row">
-      <div id="osiBowl" class="bowl">
-        <div class="bowl-symbol" id="osiSymbol">☁️</div>
-        <div id="osiSeeds">0</div>
-        <div class="bowl-label">Osi</div>
+  <h1>Move Water Move</h1>
+  <div id="game">
+    <div id="board">
+      <div class="bowl-row">
+        <div class="bowl" id="osi">
+          <div id="osi-icon" class="icon">☁️</div>
+          <div id="osi-count">0</div>
+          <div>Osi</div>
+        </div>
+        <div class="bowl" id="obasa">
+          <div id="obasa-icon" class="icon">💧</div>
+          <div id="obasa-count">0</div>
+          <div>Obasa</div>
+        </div>
       </div>
-      <div id="obasaBowl" class="bowl">
-        <div class="bowl-symbol" id="obasaSymbol">🌊</div>
-        <div id="obasaSeeds">0</div>
-        <div class="bowl-label">Obasa</div>
+      <div class="bowl-row">
+        <div class="bowl active" id="player">
+          <div id="player-icon" class="icon">🌧️</div>
+          <div id="player-count">0</div>
+          <div>You</div>
+        </div>
       </div>
     </div>
-    <div class="bowl-row">
-      <div id="playerBowl" class="bowl controlled">
-        <div class="bowl-symbol" id="playerSymbol">🌧️</div>
-        <div id="playerSeeds">0</div>
-        <div class="bowl-label">You</div>
-      </div>
+    <div class="controls">
+      <button id="rollButton">Roll Dice</button>
+      <button id="restartButton">Restart</button>
+      <button id="howToPlayButton">How to Play</button>
     </div>
-  </div>  <div>
-    <button onclick="rollDice()">Roll Dice 🎲</button>
-    <button onclick="restartGame()">Restart</button>
-    <button onclick="showHowToPlay()">How to Play</button>
-  </div>
-  <div>
-    <p>Your element: <strong id="playerElement">Rain</strong></p>
-    <p>Seeds left: <span id="seedsLeft">0</span></p>
-  </div>
-  <div id="log"></div>  <div id="howToPlayModal">
-    <div id="howToPlayContent">
-      <h2>How to Play</h2>
-      <p>Roll the dice. If you roll a number other than 1, you may place that many seeds in any combination of the bowls. If you roll a 1, the board rotates and you gain control of the next element. The goal is to get your controlled element to 21 seeds before your opponents do!</p>
-      <button onclick="hideHowToPlay()">Close</button>
-    </div>
+    <div class="log" id="log"></div>
+  </div>  <div id="overlay"></div>
+  <div id="modal">
+    <h2>How to Play</h2>
+    <p>Roll the die and place the rolled number of seeds in one or more bowls. If you roll a 1, the board rotates and you take control of a new element (Rain → River → Clouds → Rain). First to reach 21 seeds wins. AIs Obasa and Osi play after your turn. If they roll a 1, they rotate too.</p>
+    <button onclick="closeModal()">Close</button>
   </div>  <script>
-    const elements = ["Rain", "River", "Clouds"];
-    const emojis = { Rain: "🌧️", River: "🌊", Clouds: "☁️" };
-    let playerIndex = 0;
-    let playerSeeds = 0;
-    let ai = [
-      { name: "Osi", index: 1, seeds: 0, bowl: "osiBowl", symbol: "osiSymbol", display: "osiSeeds" },
-      { name: "Obasa", index: 2, seeds: 0, bowl: "obasaBowl", symbol: "obasaSymbol", display: "obasaSeeds" }
-    ];
-
-    let seedsToPlace = 0;
+    const bowls = {
+      player: { element: 'Rain', count: 0, icon: '🌧️' },
+      osi: { element: 'Cloud', count: 0, icon: '☁️' },
+      obasa: { element: 'River', count: 0, icon: '💧' }
+    };
+    const order = ['Rain', 'River', 'Cloud'];
+    let playerElementIndex = 0;
+    let rolledNumber = 0;
+    let remainingSeeds = 0;
     let gameOver = false;
 
-    const updateDisplay = () => {
-      document.getElementById("playerElement").innerText = elements[playerIndex];
-      document.getElementById("playerSeeds").innerText = playerSeeds;
-      document.getElementById("playerSymbol").innerText = emojis[elements[playerIndex]];
-      document.getElementById("seedsLeft").innerText = seedsToPlace;
+    const logEl = document.getElementById("log");
 
-      ai.forEach(bot => {
-        document.getElementById(bot.display).innerText = bot.seeds;
-        document.getElementById(bot.symbol).innerText = emojis[elements[bot.index]];
-      });
-    };
+    function updateBoard() {
+      document.getElementById("player-icon").textContent = bowls.player.icon;
+      document.getElementById("player-count").textContent = bowls.player.count;
+      document.getElementById("osi-icon").textContent = bowls.osi.icon;
+      document.getElementById("osi-count").textContent = bowls.osi.count;
+      document.getElementById("obasa-icon").textContent = bowls.obasa.icon;
+      document.getElementById("obasa-count").textContent = bowls.obasa.count;
+    }
 
-    const log = async (msg, bold = false) => {
-      const logDiv = document.getElementById("log");
-      const entry = document.createElement("div");
-      entry.className = "log-entry";
-      if (bold) entry.style.fontWeight = "bold";
-
+    function logMessage(message, isBold = false) {
+      const p = document.createElement("p");
+      if (isBold) p.classList.add("bold");
+      p.textContent = "";
+      const parent = logEl;
+      parent.insertBefore(p, parent.firstChild);
       let i = 0;
       const interval = setInterval(() => {
-        entry.innerHTML += msg.charAt(i);
+        p.textContent += message[i];
         i++;
-        if (i >= msg.length) clearInterval(interval);
+        if (i >= message.length) clearInterval(interval);
       }, 20);
+    }
 
-      logDiv.insertBefore(entry, logDiv.firstChild);
-    };
+    function rollDice() {
+      if (gameOver) return;
+      rolledNumber = Math.floor(Math.random() * 6) + 1;
+      if (rolledNumber === 1) {
+        playerElementIndex = (playerElementIndex + 1) % 3;
+        const newElement = order[playerElementIndex];
+        const iconMap = { Rain: '🌧️', River: '💧', Cloud: '☁️' };
+        bowls.player.element = newElement;
+        bowls.player.icon = iconMap[newElement];
+        logMessage(`You now control the ${newElement}`, true);
+        updateBoard();
+        setTimeout(() => { takeAITurn("osi"); }, 1000);
+        return;
+      }
+      remainingSeeds = rolledNumber;
+      alert(`You rolled a ${rolledNumber}. Tap your bowl or others to place your seeds.`);
+    }
 
-    const rollDice = () => {
-      if (seedsToPlace > 0 || gameOver) return;
-      const roll = Math.floor(Math.random() * 6) + 1;
+    function placeSeed(bowlId) {
+      if (gameOver || remainingSeeds <= 0) return;
+      bowls[bowlId].count++;
+      remainingSeeds--;
+      updateBoard();
+      if (remainingSeeds === 0) {
+        checkWinner();
+        if (!gameOver) setTimeout(() => { takeAITurn("osi"); }, 1000);
+      }
+    }
+
+    function takeAITurn(aiId) {
+      if (gameOver) return;
+      const ai = bowls[aiId];
+      const iconMap = { Rain: '🌧️', River: '💧', Cloud: '☁️' };
+      const aiOrder = ['Rain', 'River', 'Cloud'];
+      let aiElementIndex = aiOrder.indexOf(ai.element);
+
+      let roll = Math.floor(Math.random() * 6) + 1;
+      logMessage(`${aiId.charAt(0).toUpperCase() + aiId.slice(1)} rolls ${roll}`);
+
       if (roll === 1) {
-        playerIndex = (playerIndex + 1) % 3;
-        await log(`You rolled a 1.`, true);
-        await log(`You now control the ${elements[playerIndex]}.`, true);
-        updateDisplay();
-        setTimeout(() => {
-          runAITurns();
-        }, 500);
+        aiElementIndex = (aiElementIndex + 1) % 3;
+        ai.element = aiOrder[aiElementIndex];
+        ai.icon = iconMap[ai.element];
+        logMessage(`${aiId.charAt(0).toUpperCase() + aiId.slice(1)} now controls the ${ai.element}`, true);
+        updateBoard();
+        setTimeout(() => takeAITurn(aiId === "osi" ? "obasa" : null), 1000);
+        return;
+      }
+
+      let seedsToSelf = 0;
+      if (ai.count + roll === 21) {
+        seedsToSelf = roll;
       } else {
-        seedsToPlace = roll;
-        updateDisplay();
-        log(`You rolled a ${roll}. Tap a bowl to place seeds.`);
+        seedsToSelf = Math.floor(Math.random() * (roll + 1));
       }
-    };
+      const seedsToOthers = roll - seedsToSelf;
+      ai.count += seedsToSelf;
 
-    document.getElementById("playerBowl").addEventListener("click", () => {
-      if (seedsToPlace > 0 && !gameOver) {
-        playerSeeds += 1;
-        seedsToPlace -= 1;
-        updateDisplay();
-        if (playerSeeds >= 21) {
-          gameOver = true;
-          log("You win! 🎉", true);
-        } else if (seedsToPlace === 0) {
-          setTimeout(() => {
-            runAITurns();
-          }, 500);
-        }
+      if (seedsToSelf > 0) logMessage(`${aiId.charAt(0).toUpperCase() + aiId.slice(1)} adds ${seedsToSelf} seeds to the ${ai.element}`);
+
+      if (seedsToOthers > 0) {
+        const otherId = aiId === "osi" ? "obasa" : "osi";
+        bowls[otherId].count += seedsToOthers;
+        logMessage(`${aiId.charAt(0).toUpperCase() + aiId.slice(1)} adds ${seedsToOthers} seeds to the ${bowls[otherId].element}`);
       }
-    });
 
-    const runAITurns = async () => {
-      for (let bot of ai) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const roll = Math.floor(Math.random() * 6) + 1;
-        await log(`${bot.name} rolls ${roll}`);
+      updateBoard();
+      checkWinner();
+      if (aiId === "osi" && !gameOver) setTimeout(() => takeAITurn("obasa"), 2000);
+    }
 
-        if (roll === 1) {
-          bot.index = (bot.index + 1) % 3;
-          document.getElementById(bot.symbol).innerText = emojis[elements[bot.index]];
-          await log(`${bot.name} now controls ${elements[bot.index]}`, true);
-          continue;
-        }
-
-        let added = 0;
-        if (bot.seeds + roll === 21) {
-          bot.seeds += roll;
-          await log(`${bot.name} placed ${roll} seeds in the ${elements[bot.index]}`);
-        } else {
-          const giveToSelf = Math.floor(Math.random() * (roll + 1));
-          const giveToOther = roll - giveToSelf;
-          bot.seeds += giveToSelf;
-          await log(`${bot.name} placed ${giveToSelf} seeds in the ${elements[bot.index]}`);
-        }
-        updateDisplay();
-
-        if (bot.seeds >= 21 && !gameOver) {
+    function checkWinner() {
+      for (const id in bowls) {
+        if (bowls[id].count >= 21) {
           gameOver = true;
-          log(`${bot.name} wins! 🏆`, true);
+          alert(`${id === "player" ? "You" : id.charAt(0).toUpperCase() + id.slice(1)} win!`);
           return;
         }
       }
-    };
+    }
 
-    const restartGame = () => {
-      playerIndex = 0;
-      playerSeeds = 0;
-      ai[0].index = 1;
-      ai[0].seeds = 0;
-      ai[1].index = 2;
-      ai[1].seeds = 0;
-      seedsToPlace = 0;
+    function restartGame() {
+      for (const id in bowls) bowls[id].count = 0;
+      bowls.player.element = 'Rain';
+      bowls.player.icon = '🌧️';
+      playerElementIndex = 0;
       gameOver = false;
-      document.getElementById("log").innerHTML = "";
-      updateDisplay();
-    };
+      updateBoard();
+      logEl.innerHTML = "";
+    }
 
-    const showHowToPlay = () => {
-      document.getElementById("howToPlayModal").style.display = "flex";
-    };
+    function openModal() {
+      document.getElementById("modal").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
 
-    const hideHowToPlay = () => {
-      document.getElementById("howToPlayModal").style.display = "none";
-    };
+    document.getElementById("rollButton").addEventListener("click", rollDice);
+    document.getElementById("restartButton").addEventListener("click", restartGame);
+    document.getElementById("howToPlayButton").addEventListener("click", openModal);
 
-    updateDisplay();
+    document.getElementById("player").addEventListener("click", () => placeSeed("player"));
+    document.getElementById("osi").addEventListener("click", () => placeSeed("osi"));
+    document.getElementById("obasa").addEventListener("click", () => placeSeed("obasa"));
+
+    updateBoard();
   </script></body>
 </html>
