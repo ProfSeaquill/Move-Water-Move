@@ -188,8 +188,10 @@ function logMessage(message) {
 
       if (roll === 1) {
         rotatePlayer();
+        setTimeout(aiTurn, 1000); // move to AI
         return;
       }
+
 
       seedsLeft = roll;
       updateBoard();
@@ -223,7 +225,9 @@ function logMessage(message) {
     function rotatePlayer() {
       playerElementIndex = (playerElementIndex + 1) % 3;
       updateBoard();
+      if (playerElementIndex === 0) {
       logMessage(`**You now control the ${elements[playerElementIndex]}**`);
+      }
       setTimeout(aiTurn, 1000);
     }
 
@@ -247,6 +251,11 @@ function logMessage(message) {
         if (roll === 1) {
           logMessage(`${name} rolled a 1 — rotating the board`);
           rotatePlayer();
+          setTimeout(() => {
+          if (++ai < aiIndices.length) {
+            nextAI();
+          }
+        }, 1000);
           return;
         }
 
