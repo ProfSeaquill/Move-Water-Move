@@ -177,7 +177,9 @@ function logMessage(message) {
   }, 30);
 }
 
-
+function elementToBowlIndex(elementIndex) {
+  return (playerIndex + elementIndex) % 3;
+}
     function rollDice() {
       if (seedsLeft > 0 || gameEnded) return;
 
@@ -275,9 +277,10 @@ function logMessage(message) {
 
         let added = [0, 0, 0];
         while (toAdd > 0) {
-          const idx = Math.floor(Math.random() * 3);
-          bowls[idx]++;
-          added[idx]++;
+          const elementIdx = Math.floor(Math.random() * 3);
+          const bowlIdx = elementToBowlIndex(elementIdx);
+          bowls[bowlIdx]++;
+          added[elementIdx]++;
           toAdd--;
         }
 
