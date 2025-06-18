@@ -177,8 +177,8 @@ function logMessage(message) {
   }, 30);
 }
 
-function elementToBowlIndex(elementIndex) {
-  return (playerIndex + elementIndex) % 3;
+function elementToBowlIndex(elementIndex, originIndex = playerIndex) {
+  return (originIndex + elementIndex) % 3;
 }
     function rollDice() {
       if (seedsLeft > 0 || gameEnded) return;
@@ -266,7 +266,8 @@ function elementToBowlIndex(elementIndex) {
 
 
         let toAdd = roll;
-        if (bowls[elIndex] + toAdd === 21) {
+        const targetBowlIndex = elementToBowlIndex(elIndex, aiIndex);
+        if (bowls[targetBowlIndex] + toAdd === 21) {
           bowls[elIndex] += toAdd;
           logMessage(`${name} placed ${toAdd} seeds in the ${elements[elIndex]}`);
           updateBoard();
@@ -278,7 +279,7 @@ function elementToBowlIndex(elementIndex) {
         let added = [0, 0, 0];
         while (toAdd > 0) {
           const elementIdx = Math.floor(Math.random() * 3);
-          const bowlIdx = elementToBowlIndex(elementIdx);
+          const bowlIdx = elementToBowlIndex(elementIdx, aiIndex);
           bowls[bowlIdx]++;
           added[elementIdx]++;
           toAdd--;
