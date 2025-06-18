@@ -181,7 +181,7 @@
           logMessage("You win!");
           gameEnded = true;
         } else if (seedsLeft === 0) {
-          setTimeout(aiTurn, 1000);
+          setTimeout(aiTurn, 2500);
         }
       });
     });
@@ -211,7 +211,7 @@
           rotatePlayer();
           setTimeout(() => {
             if (++ai < aiIndices.length) nextAI();
-          }, 1000);
+          }, 2500);
           return;
         }
 
@@ -231,158 +231,7 @@
         }
         updateBoard();
         if (++ai < aiIndices.length) {
-          setTimeout(nextAI, 1000);
-        }
-      }
-
-      nextAI();
-    }
-
-    restartGame();
-  </script>
-</body>
-</html>
-  class="bowl">
-      <div id="emoji3"></div>
-      <div id="count3">0</div>
-      <div class="bowl-label">Osi</div>
-    </div>
-  </div>
-
-  <div class="controls">
-    <button onclick="rollDice()">Roll Dice 🎲</button>
-    <button onclick="restartGame()">Restart</button>
-    <button onclick="toggleHowToPlay()">How to Play</button>
-    <p>Your element: <strong id="playerElement"></strong></p>
-    <p>Seeds left: <span id="seedsLeft">0</span></p>
-  </div>
-
-  <div id="log"></div>
-
-  <div id="howToPlay">
-    <h3>How to Play</h3>
-    <p>Roll the dice. Add that many seeds to any bowl—yours or an opponent’s. If you roll a 1, your turn ends and the board rotates, shifting your element. The first to reach 21 seeds in their current element wins.</p>
-    <button onclick="toggleHowToPlay()">Close</button>
-  </div>
-
-  <script>
-    const emojis = ["🌧️", "🌊", "☁️"];
-    const elements = ["Rain", "River", "Clouds"];
-    let bowls = [0, 0, 0];
-    let playerIndex = 0;
-    let playerElementIndex = 2;
-    let seedsLeft = 0;
-    let gameEnded = false;
-
-    function updateBoard() {
-      const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];
-      for (let i = 0; i < 3; i++) {
-        const logical = visualToLogical[i];
-        const emojiEl = document.getElementById(`emoji${i + 1}`);
-        const countEl = document.getElementById(`count${i + 1}`);
-        const bowlEl = document.getElementById(`bowl${i + 1}`);
-        emojiEl.textContent = emojis[(playerElementIndex - logical + 3) % 3];
-        countEl.textContent = bowls[logical];
-        bowlEl.classList.toggle("highlight", logical === playerIndex);
-      }
-      document.getElementById("playerElement").textContent = elements[playerElementIndex];
-      document.getElementById("seedsLeft").textContent = seedsLeft;
-    }
-
-    function toggleHowToPlay() {
-      const modal = document.getElementById("howToPlay");
-      modal.style.display = modal.style.display === "none" ? "block" : "none";
-    }
-
-    function restartGame() {
-      bowls = [0, 0, 0];
-      playerElementIndex = 0;
-      seedsLeft = 0;
-      gameEnded = false;
-      document.getElementById("log").innerHTML = "";
-      updateBoard();
-    }
-
-    function logMessage(message) {
-      const log = document.getElementById("log");
-      const msg = document.createElement("div");
-
-      const isBold = message.startsWith("**") && message.endsWith("**");
-      if (isBold) {
-        message = message.slice(2, -2);
-        msg.innerHTML = "<strong></strong>";
-
-      });
-    });
-
-    function rotatePlayer() {
-      playerElementIndex = (playerElementIndex + 2) % 3;
-      updateBoard();
-      logMessage(`**You now control the ${elements[playerElementIndex]}**`);
-    }
-
-    function aiTurn() {
-      if (gameEnded) return;
-
-      const aiNames = ["Osi", "Obasa"];
-      const aiIndices = [2, 0];
-
-      let ai = 0;
-      function nextAI() {
-        if (ai >= aiIndices.length) return;
-
-        const aiIndex = aiIndices[ai];
-        const name = aiNames[ai];
-        const elIndex = (playerElementIndex - aiIndex + 3) % 3;
-
-        const roll = Math.floor(Math.random() * 6) + 1;
-        logMessage(`${name} rolls ${roll}`);
-
-        if (roll === 1) {
-          logMessage(`${name} rolled a 1`);
-          rotatePlayer();
-          setTimeout(() => {
-            if (++ai < aiIndices.length) {
-              nextAI();
-            }
-          }, 2500);
-          return;
-        }
-
-        let toAdd = roll;
-        if (bowls[elIndex] + toAdd === 21) {
-          bowls[elIndex] += toAdd;
-          logMessage(`${name} placed ${toAdd} seeds in the ${elements[elIndex]}`);
-          updateBoard();
-          logMessage(`${name} wins!`);
-          gameEnded = true;
-          return;
-        }
-
-        let added = [0, 0, 0];
-        while (toAdd > 0) {
-          const elementIdx = Math.floor(Math.random() * 3);
-          const bowlIdx = elementToBowlIndex(elementIdx);
-          bowls[bowlIdx]++;
-          added[elementIdx]++;
-          toAdd--;
-        }
-
-        for (let i = 0; i < 3; i++) {
-          if (added[i]) {
-            logMessage(`${name} placed ${added[i]} seeds in the ${elements[i]}`);
-          }
-        }
-
-        updateBoard();
-        if (bowls[elIndex] >= 21) {
-          logMessage(`${name} wins!`);
-          gameEnded = true;
-          return;
-        }
-
-        if (++ai < aiIndices.length) {
-          setTimeout(nextAI, 1000);
+          setTimeout(nextAI, 2500);
         }
       }
 
