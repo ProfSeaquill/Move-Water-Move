@@ -231,7 +231,7 @@ function elementToBowlIndex(elementIndex, originIndex = playerIndex) {
     });
 
     function rotatePlayer() {
-      playerElementIndex = (playerElementIndex + 2) % 3;
+      playerElementIndex = (playerElementIndex + 1) % 3;
       updateBoard();
       logMessage(`**You now control the ${elements[playerElementIndex]}**`);
     }
@@ -244,6 +244,9 @@ function elementToBowlIndex(elementIndex, originIndex = playerIndex) {
 
       let ai = 0;
       function nextAI() {
+        if (gameEnded) return;
+          setTimeout(nextAI, 1000);
+        }
         if (ai >= aiIndices.length) return;
 
         const aiIndex = aiIndices[ai];
