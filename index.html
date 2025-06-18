@@ -87,12 +87,12 @@
     <div id="bowl2" class="bowl">
       <div id="emoji2"></div>
       <div id="count2">0</div>
-      <div class="bowl-label">Osi</div>
+      <div class="bowl-label">Obasa</div>
     </div>
     <div id="bowl3" class="bowl">
       <div id="emoji3"></div>
       <div id="count3">0</div>
-      <div class="bowl-label">Obasa</div>
+      <div class="bowl-label">Osi</div>
     </div>
   </div>
 
@@ -213,7 +213,7 @@ function logMessage(message) {
             if (i === (playerIndex + 2) % 3) {
               logMessage("You win!");
             } else {
-              const winner = i === 0 ? "You" : i === 1 ? "Osi" : "Obasa";
+              const winner = i === 0 ? "You" : i === 1 ? "Obasa" : "Osi";
               logMessage(`${winner} wins!`);
             }
             gameEnded = true;
@@ -237,7 +237,7 @@ function logMessage(message) {
     function aiTurn() {
       if (gameEnded) return;
 
-      const aiNames = ["Obasa", "Osi"];
+      const aiNames = ["Osi", "Obasa"];
       const aiIndices = [2, 0];
 
       let ai = 0;
