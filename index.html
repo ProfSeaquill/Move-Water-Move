@@ -249,6 +249,7 @@ function logMessage(message) {
 
         if (roll === 1) {
           logMessage(`${name} rolled a 1 — rotating the board`);
+          logMessage(`**You now control the ${elements[playerElementIndex]}**`);
           rotatePlayer();
           setTimeout(() => {
           if (++ai < aiIndices.length) {
