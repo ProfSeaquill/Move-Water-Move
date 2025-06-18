@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Move Water Move</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    .board {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      width: 300px;
+      margin: 40px auto;
+      position: relative;
+    }
+    .bowl {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #fff;
+      border: 3px solid #888;
+      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .icon {
+      font-size: 24px;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    #message {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Move Water Move</h1>
+  <div class="board">
+    <div class="bowl" id="bowl1">
+      <div class="icon" id="icon1">🌧️</div>
+      <div id="label1">Rain</div>
+      <div id="count1">0</div>
+    </div>
+    <div class="bowl" id="bowl2">
+      <div class="icon" id="icon2">🌊</div>
+      <div id="label2">River</div>
+      <div id="count2">0</div>
+    </div>
+    <div class="bowl" id="bowl3">
+      <div class="icon" id="icon3">☁️</div>
+      <div id="label3">Clouds</div>
+      <div id="count3">0</div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button onclick="rollDice()">Roll Dice 🎲</button>
+    <div id="message">Your element: <strong id="current-element">Rain</strong></div>
+    <div id="beads-remaining"></div>
+  </div>
+
+  <script>
+    let bowls = [
+      { label: "Rain", icon: "🌧️", count: 0 },
+      { label: "River", icon: "🌊", count: 0 },
+      { label: "Clouds", icon: "☁️", count: 0 },
+    ];
+    let currentIndex = 0;
+    let beadsToAdd = 0;
+
+    function updateDisplay() {
+      for (let i = 0; i < 3; i++) {
+        document.getElementById("icon" + (i + 1)).textContent = bowls[i].icon;
+        document.getElementById("label" + (i + 1)).textContent = bowls[i].label;
+        document.getElementById("count" + (i + 1)).textContent = bowls[i].count;
+      }
+      document.getElementById("current-element").textContent = bowls[currentIndex].label;
+    }
+
+    function rollDice() {
+      if (checkWin()) return;
+      beadsToAdd = Math.floor(Math.random() * 6) + 1;
+      if (beadsToAdd === 1) {
+        rotateBoard();
+        document.getElementById("message").innerHTML = `Rolled a 1! Switched to <strong>${bowls[currentIndex].label}</strong>.`;
+      } else {
+        document.getElementById("message").innerHTML = `Rolled a ${beadsToAdd}. Tap a bowl to place seeds one at a time.`;
+        document.getElementById("beads-remaining").textContent = `Seeds left: ${beadsToAdd}`;
+      }
+      updateDisplay();
+    }
+
+    function rotateBoard() {
+      // Move last to front and shift elements
+      bowls.unshift(bowls.pop());
+      currentIndex = 0;
+    }
+
+    function addBead(i) {
+      if (beadsToAdd > 0 && !checkWin()) {
+        bowls[i].count += 1;
+        beadsToAdd -= 1;
+        updateDisplay();
+        document.getElementById("beads-remaining").textContent = `Seeds left: ${beadsToAdd}`;
+        checkWin();
+      }
+    }
+
+    function checkWin() {
+      if (bowls[currentIndex].count >= 21) {
+        document.getElementById("message").innerHTML = `<strong>You win!</strong> ${bowls[currentIndex].label} reached 21 seeds.`;
+        document.getElementById("beads-remaining").textContent = "";
+        return true;
+      }
+      return false;
+    }
+
+    for (let i = 0; i < 3; i++) {
+      document.getElementById("bowl" + (i + 1)).onclick = () => addBead(i);
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
