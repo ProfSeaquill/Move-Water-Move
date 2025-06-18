@@ -1,193 +1,256 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Move Water Move</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      margin: 0;
-      padding: 0;
-      background: #f0f0f0;
-    }
-    h1 {
-      margin-top: 1em;
+      background-color: #f2f2f2;
     }
     .board {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: relative;
-      width: 300px;
-      height: 300px;
       margin: 20px auto;
+      width: 300px;
+      height: 260px;
     }
     .bowl {
-      position: absolute;
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
+      border: 4px solid #888;
       border-radius: 50%;
-      border: 4px solid #999;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      background: white;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      background-color: white;
+      font-size: 1.5em;
+      transition: background-color 0.3s, border 0.3s;
     }
-    .bowl .label {
-      font-size: 14px;
-      margin-top: 5px;
+    .highlight {
+      border: 4px solid #007bff;
     }
-    .bowl.current {
-      border-color: blue;
+    .bowl-label {
+      font-size: 0.6em;
+      margin-top: 4px;
     }
+    #bowl1 { top: 0; left: 50%; transform: translateX(-50%); }
+    #bowl2 { bottom: 0; left: 20px; }
+    #bowl3 { bottom: 0; right: 20px; }
     .controls {
       margin: 20px;
     }
-    .log {
-      width: 90%;
-      max-width: 500px;
-      height: 200px;
+    #log {
+      width: 80%;
+      height: 150px;
       margin: 20px auto;
-      background: white;
-      border: 1px solid #ccc;
-      overflow-y: auto;
       padding: 10px;
-      text-align: left;
+      border: 1px solid #ccc;
+      background-color: white;
+      overflow-y: auto;
+      font-size: 0.9em;
       display: flex;
       flex-direction: column-reverse;
-      font-family: monospace;
+    }
+    #howToPlay {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      background: white;
+      padding: 20px;
+      border: 2px solid #888;
+      z-index: 10;
     }
   </style>
-</head>
-<body>
-  <h1>Move Water Move</h1>
-  <div class="board">
-    <div class="bowl" id="bowl1" style="top: 0; left: 95px;"></div>
-    <div class="bowl" id="bowl2" style="top: 170px; left: 0;"></div>
-    <div class="bowl" id="bowl3" style="top: 170px; left: 190px;"></div>
-  </div>
-  <div class="controls">
+</head><body>
+  <h1>Move Water Move</h1>  <div class="board">
+    <div id="bowl1" class="bowl">
+      <div id="emoji1"></div>
+      <div id="count1">0</div>
+      <div class="bowl-label">Osi</div>
+    </div>
+    <div id="bowl2" class="bowl">
+      <div id="emoji2"></div>
+      <div id="count2">0</div>
+      <div class="bowl-label">You</div>
+    </div>
+    <div id="bowl3" class="bowl">
+      <div id="emoji3"></div>
+      <div id="count3">0</div>
+      <div class="bowl-label">Obasa</div>
+    </div>
+  </div>  <div class="controls">
     <button onclick="rollDice()">Roll Dice 🎲</button>
     <button onclick="restartGame()">Restart</button>
-    <p id="status"></p>
-    <p id="element"></p>
-    <p id="seeds"></p>
-  </div>
-  <div class="log" id="log"></div>
-  <script>
-    const elements = ['Rain', 'River', 'Clouds'];
-    const symbols = { Rain: '🌧️', River: '🌊', Clouds: '☁️' };
-    const bowls = [
-      { id: 'bowl1', owner: 'Osi', seeds: 0, element: 'Rain' },
-      { id: 'bowl2', owner: 'Player', seeds: 0, element: 'River' },
-      { id: 'bowl3', owner: 'Obasa', seeds: 0, element: 'Clouds' },
-    ];
-    let playerIndex = 1;
-    let seedsToPlace = 0;function updateBoard() {
-  bowls.forEach((bowl, index) => {
-    const el = document.getElementById(bowl.id);
-    el.innerHTML = `${symbols[bowl.element]}<br>${bowl.seeds}<div class="label">${bowl.element} (${bowl.owner})</div>`;
-    el.className = 'bowl';
-    if (index === playerIndex) el.classList.add('current');
-    el.onclick = () => {
-      if (seedsToPlace > 0) {
-        bowl.seeds++;
-        seedsToPlace--;
-        updateBoard();
-        if (seedsToPlace === 0) checkWin(bowl);
+    <button onclick="toggleHowToPlay()">How to Play</button>
+    <p>Your element: <strong id="playerElement"></strong></p>
+    <p>Seeds left: <span id="seedsLeft">0</span></p>
+  </div>  <div id="log"></div>  <div id="howToPlay">
+    <h3>How to Play</h3>
+    <p>Roll the dice. Add that many seeds (💧) to any bowl—yours or an opponent’s. If you roll a 1, your turn ends and the board rotates, shifting your element. The first to reach 21 seeds in their current element wins.</p>
+    <button onclick="toggleHowToPlay()">Close</button>
+  </div>  <script>
+    const emojis = ["🌧️", "🌊", "☁️"];
+    const elements = ["Rain", "River", "Clouds"];
+    let bowls = [0, 0, 0];
+    let playerIndex = 1; // middle bowl
+    let currentIndex = 1; // start as player
+    let playerElementIndex = 0;
+    let seedsLeft = 0;
+    let gameEnded = false;
+
+    function updateBoard() {
+      for (let i = 0; i < 3; i++) {
+        const bowl = document.getElementById(`bowl${i+1}`);
+        document.getElementById(`emoji${i+1}`).textContent = emojis[(playerElementIndex + i + 2) % 3];
+        document.getElementById(`count${i+1}`).textContent = bowls[(currentIndex + i + 2) % 3];
+        bowl.classList.toggle("highlight", i === playerIndex);
       }
-    };
-  });
-  document.getElementById('element').innerText = `Your element: ${bowls[playerIndex].element}`;
-  document.getElementById('seeds').innerText = `Seeds left: ${seedsToPlace}`;
-}
+      document.getElementById("playerElement").textContent = elements[playerElementIndex];
+      document.getElementById("seedsLeft").textContent = seedsLeft;
+    }
 
-function rollDice() {
-  if (seedsToPlace > 0) return;
-  const roll = Math.floor(Math.random() * 6) + 1;
-  if (roll === 1) {
-    playerIndex = (playerIndex + 1) % 3;
-    logMessage(`You rolled a 1. Rotating to ${bowls[playerIndex].element}.`);
-    updateBoard();
-    runAITurns();
-    return;
-  }
-  seedsToPlace = roll;
-  updateBoard();
-  logMessage(`You rolled a ${roll}. Tap a bowl to place seeds.`);
-}
+    function toggleHowToPlay() {
+      const modal = document.getElementById("howToPlay");
+      modal.style.display = modal.style.display === "none" ? "block" : "none";
+    }
 
-function checkWin(bowl) {
-  if (bowl.seeds >= 21) {
-    logMessage(`${bowl.owner} wins with ${bowl.element}!`);
-    seedsToPlace = 0;
-  } else {
-    runAITurns();
-  }
-}
-
-async function runAITurns() {
-  for (let i = 0; i < 3; i++) {
-    if (i === playerIndex) continue;
-    const bowl = bowls[i];
-    await sleep(1000);
-    const roll = Math.floor(Math.random() * 6) + 1;
-    logMessage(`${bowl.owner} rolls ${roll}`);
-    if (roll === 1) {
-      bowl.element = elements[(elements.indexOf(bowl.element) + 1) % 3];
-      logMessage(`${bowl.owner} rotates to ${bowl.element}`);
+    function restartGame() {
+      bowls = [0, 0, 0];
+      playerElementIndex = 0;
+      currentIndex = 1;
+      seedsLeft = 0;
+      gameEnded = false;
+      document.getElementById("log").innerHTML = "";
       updateBoard();
-      continue;
     }
-    let placed = 0;
-    if (bowl.seeds + roll === 21) {
-      bowl.seeds += roll;
-      logMessage(`${bowl.owner} places ${roll} seeds in ${bowl.element}`);
-    } else {
-      let toSelf = Math.floor(Math.random() * (roll + 1));
-      bowl.seeds += toSelf;
-      logMessage(`${bowl.owner} places ${toSelf} seeds in ${bowl.element}`);
+
+    function logMessage(message) {
+      const log = document.getElementById("log");
+      const msg = document.createElement("div");
+      msg.textContent = "";
+      log.insertBefore(msg, log.firstChild);
+
+      let i = 0;
+      const interval = setInterval(() => {
+        msg.textContent += message[i++];
+        if (i >= message.length) clearInterval(interval);
+      }, 30);
     }
-    updateBoard();
-    if (bowl.seeds >= 21) {
-      logMessage(`${bowl.owner} wins with ${bowl.element}!`);
-      break;
+
+    function rollDice() {
+      if (seedsLeft > 0 || gameEnded) return;
+
+      const roll = Math.floor(Math.random() * 6) + 1;
+      logMessage(`You rolled a ${roll}`);
+
+      if (roll === 1) {
+        rotatePlayer();
+        return;
+      }
+
+      seedsLeft = roll;
+      updateBoard();
     }
-    await sleep(1000);
-  }
-}
 
-function logMessage(msg) {
-  const log = document.getElementById('log');
-  const line = document.createElement('div');
-  typeText(line, msg);
-  log.prepend(line);
-}
+    document.querySelectorAll(".bowl").forEach((bowl, idx) => {
+      bowl.addEventListener("click", () => {
+        if (seedsLeft <= 0 || gameEnded) return;
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+        const logicalIndex = (currentIndex + idx + 2) % 3;
+        bowls[logicalIndex]++;
+        seedsLeft--;
+        logMessage(`You placed 1 seed in the ${elements[(playerElementIndex + idx + 2) % 3]}`);
 
-function typeText(el, text, i = 0) {
-  if (i < text.length) {
-    el.innerHTML += text.charAt(i);
-    setTimeout(() => typeText(el, text, i + 1), 30);
-  }
-}
+        updateBoard();
 
-function restartGame() {
-  bowls.forEach(bowl => bowl.seeds = 0);
-  bowls[0].element = 'Rain';
-  bowls[1].element = 'River';
-  bowls[2].element = 'Clouds';
-  playerIndex = 1;
-  seedsToPlace = 0;
-  updateBoard();
-  document.getElementById('log').innerHTML = '';
-}
+        if (bowls[(currentIndex + playerIndex + 2) % 3] >= 21) {
+          logMessage("You win!");
+          gameEnded = true;
+          return;
+        }
 
-updateBoard();
+        if (seedsLeft === 0) {
+          setTimeout(aiTurn, 1000);
+        }
+      });
+    });
 
+    function rotatePlayer() {
+      playerElementIndex = (playerElementIndex + 1) % 3;
+      updateBoard();
+      setTimeout(aiTurn, 1000);
+    }
+
+    function aiTurn() {
+      if (gameEnded) return;
+
+      const aiNames = ["Osi", "Obasa"];
+      const aiIndices = [0, 2];
+
+      let ai = 0;
+      function nextAI() {
+        if (ai >= aiIndices.length) return;
+
+        const aiIndex = aiIndices[ai];
+        const name = aiNames[ai];
+        const elIndex = (playerElementIndex + aiIndex + 2) % 3;
+
+        const roll = Math.floor(Math.random() * 6) + 1;
+        logMessage(`${name} rolls ${roll}`);
+
+        if (roll === 1) {
+          if (++ai === aiIndices.length) return;
+          setTimeout(nextAI, 1000);
+          return;
+        }
+
+        let toAdd = roll;
+        if (bowls[elIndex] + toAdd === 21) {
+          bowls[elIndex] += toAdd;
+          logMessage(`${name} placed ${toAdd} seeds in the ${elements[elIndex]}`);
+          updateBoard();
+          logMessage(`${name} wins!`);
+          gameEnded = true;
+          return;
+        }
+
+        let added = [0, 0, 0];
+        while (toAdd > 0) {
+          const idx = Math.floor(Math.random() * 3);
+          bowls[idx]++;
+          added[idx]++;
+          toAdd--;
+        }
+
+        for (let i = 0; i < 3; i++) {
+          if (added[i]) {
+            logMessage(`${name} placed ${added[i]} seeds in the ${elements[i]}`);
+          }
+        }
+
+        updateBoard();
+        if (bowls[elIndex] >= 21) {
+          logMessage(`${name} wins!`);
+          gameEnded = true;
+          return;
+        }
+
+        if (++ai < aiIndices.length) {
+          setTimeout(nextAI, 1000);
+        }
+      }
+
+      nextAI();
+    }
+
+    restartGame();
   </script>
 </body>
 </html>
