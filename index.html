@@ -223,7 +223,7 @@ function logMessage(message) {
     });
 
     function rotatePlayer() {
-      playerElementIndex = (playerElementIndex + 1) % 3;
+      playerElementIndex = (playerElementIndex + 2) % 3;
       updateBoard();
       if (playerElementIndex === 0) {
       logMessage(`**You now control the ${elements[playerElementIndex]}**`);
