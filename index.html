@@ -181,8 +181,7 @@
         const logicalIndex = (currentIndex + idx + 2) % 3;
         bowls[logicalIndex]++;
         seedsLeft--;
-        logMessage(`You placed 1 seed in the ${elements[(playerElementIndex + idx + 2) % 3]}`);
-
+        
         updateBoard();
 
         if (bowls[(currentIndex + playerIndex + 2) % 3] >= 21) {
