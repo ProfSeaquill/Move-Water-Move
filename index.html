@@ -231,9 +231,7 @@ function logMessage(message) {
     function rotatePlayer() {
       playerElementIndex = (playerElementIndex + 2) % 3;
       updateBoard();
-      if (playerElementIndex === 0) {
       logMessage(`**You now control the ${elements[playerElementIndex]}**`);
-      }
     }
 
     function aiTurn() {
@@ -248,7 +246,7 @@ function logMessage(message) {
 
         const aiIndex = aiIndices[ai];
         const name = aiNames[ai];
-        const elIndex = (playerElementIndex + aiIndex + 2) % 3;
+        const elIndex = (playerElementIndex + aiIndex + 3) % 3;
 
         const roll = Math.floor(Math.random() * 6) + 1;
         logMessage(`${name} rolls ${roll}`);
