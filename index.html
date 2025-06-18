@@ -121,15 +121,19 @@
     let gameEnded = false;
 
     function updateBoard() {
-      for (let i = 0; i < 3; i++) {
-        const bowl = document.getElementById(`bowl${i+1}`);
-        document.getElementById(`emoji${i+1}`).textContent = emojis[(playerElementIndex + i + 2) % 3];
-        document.getElementById(`count${i+1}`).textContent = bowls[(currentIndex + i + 2) % 3];
-        bowl.classList.toggle("highlight", i === playerIndex);
+     const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];
+
+     for (let i = 0; i < 3; i++) {
+        const logical = visualToLogical[i];
+        const emojiEl = document.getElementById(`emoji${i+1}`);
+        const countEl = document.getElementById(`count${i+1}`);
+        const bowlEl = document.getElementById(`bowl${i+1}`);
+
+        emojiEl.textContent = emojis[(playerElementIndex + logical) % 3];
+        countEl.textContent = bowls[logical];
+        bowlEl.classList.toggle("highlight", logical === playerIndex);
       }
-      document.getElementById("playerElement").textContent = elements[playerElementIndex];
-      document.getElementById("seedsLeft").textContent = seedsLeft;
-    }
+
 
     function toggleHowToPlay() {
       const modal = document.getElementById("howToPlay");
@@ -190,7 +194,10 @@ function logMessage(message) {
       bowl.addEventListener("click", () => {
         if (seedsLeft <= 0 || gameEnded) return;
 
-        const logicalIndex = (currentIndex + idx + 2) % 3;
+        // Map clicked bowl to actual bowl
+        const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];
+        const logicalIndex = visualToLogical[idx];
+
         bowls[logicalIndex]++;
         seedsLeft--;
         
