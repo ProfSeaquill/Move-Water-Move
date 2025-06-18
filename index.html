@@ -133,7 +133,9 @@
         countEl.textContent = bowls[logical];
         bowlEl.classList.toggle("highlight", logical === playerIndex);
       }
-
+      document.getElementById("playerElement").textContent = elements[playerElementIndex];
+      document.getElementById("seedsLeft").textContent = seedsLeft;
+    }
 
     function toggleHowToPlay() {
       const modal = document.getElementById("howToPlay");
@@ -154,26 +156,27 @@ function logMessage(message) {
   const log = document.getElementById("log");
   const msg = document.createElement("div");
 
-  // Detect bold markers and format the message accordingly
-  if (message.startsWith("**") && message.endsWith("**")) {
-    message = message.slice(2, -2); // Remove the **
-    msg.innerHTML = `<strong></strong>`;
+  const isBold = message.startsWith("**") && message.endsWith("**");
+  if (isBold) {
+    message = message.slice(2, -2);
+    msg.innerHTML = "<strong></strong>";
   }
 
   log.insertBefore(msg, log.firstChild);
 
   let i = 0;
   const interval = setInterval(() => {
-    if (msg.innerHTML === `<strong></strong>`) {
-      // Typing effect inside bold
-      msg.innerHTML = `<strong>${message.slice(0, i)}</strong>`;
+    if (isBold) {
+      const strong = msg.querySelector("strong");
+      strong.textContent = message.slice(0, i + 1);
     } else {
-      msg.textContent += message[i];
+      msg.textContent = message.slice(0, i + 1);
     }
     i++;
     if (i >= message.length) clearInterval(interval);
   }, 30);
 }
+
 
     function rollDice() {
       if (seedsLeft > 0 || gameEnded) return;
