@@ -246,7 +246,7 @@ function logMessage(message) {
 
         const aiIndex = aiIndices[ai];
         const name = aiNames[ai];
-        const elIndex = (playerElementIndex + aiIndex + 3) % 3;
+        const elIndex = (playerElementIndex - aiIndex + 3) % 3;
 
         const roll = Math.floor(Math.random() * 6) + 1;
         logMessage(`${name} rolls ${roll}`);
@@ -258,7 +258,7 @@ function logMessage(message) {
           if (++ai < aiIndices.length) {
             nextAI();
           }
-        }, 1000);
+        }, 2500);
           return;
         }
 
