@@ -262,10 +262,10 @@ function aiTurn() {
 
     let added = [0, 0, 0];
 while (toAdd > 0) {
-  const elementIdx = Math.floor(Math.random() * 3); // Pick a random element: 0 = Rain, 1 = River, 2 = Clouds
-  const bowlIdx = (playerIndex + elementIdx - aiIndex + 3) % 3; // Adjust mapping from AI's POV to board layout
-  bowls[bowlIdx]++; // Add seed to correct bowl
-  added[elementIdx]++; // Track how many seeds went into each element
+  const elementIndex = Math.floor(Math.random() * 3); // Pick a random element: 0 = Rain, 1 = River, 2 = Clouds
+  const bowlIndex = (playerIndex + elementIndex - aiIndex + 3) % 3; // Adjust mapping from AI's POV to board layout
+  bowls[bowlIndex]++; // Add seed to correct bowl
+  added[elementIndex]++; // Track how many seeds went into each element
   toAdd--;
 }
 
