@@ -241,10 +241,9 @@ function elementToBowlIndex(elementIndex) {
     const targetBowl = (playerIndex + elementInFrontOfAI) % 3;
 
     const roll = Math.floor(Math.random() * 6) + 1;
-    logMessage(`${name} rolls ${roll}`);
+    logMessage(`${name} rolled a ${roll}`);
 
     if (roll === 1) {
-      logMessage(`${name} rolled a 1`);
       rotatePlayer();
       setTimeout(() => {
         ai++;
