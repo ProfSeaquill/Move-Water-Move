@@ -229,8 +229,8 @@ function logMessage(message) {
  function aiTurn() {
   if (gameEnded) return;
 
-  const aiNames = ["Osi", "Obasa"];
-  const aiSeats = [2, 1]; // Osi at seat 2, Obasa at seat 1
+  const aiNames = ["Obasa", "Osi"];
+  const aiSeats = [1, 2]; // Osi at seat 2, Obasa at seat 1
 
   let ai = 0;
 
@@ -240,7 +240,7 @@ function logMessage(message) {
     const name = aiNames[ai];
     const seat = aiSeats[ai];
 
-    const elementInFrontOfAI = (playerElementIndex - seat + 3) % 3;
+    const elementInFrontOfAI = (playerElementIndex + seat) % 3;
     const roll = Math.floor(Math.random() * 6) + 1;
 
     logMessage(`${name} rolled a ${roll}`);
