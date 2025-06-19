@@ -106,7 +106,7 @@
     let gameEnded = false;  
   
     function updateBoard() {  
-     const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];  
+     const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];  
   
      for (let i = 0; i < 3; i++) {  
         const logical = visualToLogical[i];  
@@ -186,7 +186,7 @@ function elementToBowlIndex(elementIndex) {
         if (seedsLeft <= 0 || gameEnded) return;  
   
         // Map clicked bowl to actual bowl  
-        const visualToLogical = [playerIndex, (playerIndex + 1) % 3, (playerIndex + 2) % 3];  
+        const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];  
         const logicalIndex = visualToLogical[idx];  
   
         bowls[logicalIndex]++;  
