@@ -265,6 +265,38 @@ function logMessage(message) {
 
     // Otherwise, random but aligned placement
     let added = [0, 0, 0];
+
+function addSeedStep() {
+  if (toAdd <= 0) {
+    for (let i = 0; i < 3; i++) {
+      if (added[i]) {
+        logMessage(`${name} placed ${added[i]} seeds in the ${elements[i]}`);
+      }
+    }
+
+    updateBoard();
+
+    if (elementSeeds[elementInFrontOfAI] >= 21) {
+      logMessage(`${name} wins!`);
+      gameEnded = true;
+      return;
+    }
+
+    ai++;
+    setTimeout(nextAI, 1000);
+    return;
+  }
+  const randElement = Math.floor(Math.random() * 3);
+    elementSeeds[randElement]++;
+    added[randElement]++;
+    toAdd--;
+
+    updateBoard();
+    setTimeout(addSeedStep, 300); // adjust timing for speed
+  }
+
+addSeedStep(); // start it
+
     while (toAdd > 0) {
       const randElement = Math.floor(Math.random() * 3);
       elementSeeds[randElement]++;
