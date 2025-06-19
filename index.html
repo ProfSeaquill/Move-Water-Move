@@ -236,9 +236,6 @@ function logMessage(message) {
     // Find the element currently sitting in front of this AI (based on player rotation)
     const elementInFrontOfAI = (playerElementIndex - seat + 3) % 3;
 
-    // From the player's perspective, this element is now at this bowl index:
-    const targetBowl = (playerIndex + elementInFrontOfAI) % 3;
-
     const roll = Math.floor(Math.random() * 6) + 1;
     logMessage(`${name} rolled a ${roll}`);
 
@@ -255,7 +252,7 @@ function logMessage(message) {
 
     // Try to win
     if (elementSeeds[elementInFrontOfAI] + toAdd === 21) {
-      elementSeeds[elementIndex] += toAdd;
+      elementSeeds[elementInFrontofAI] += toAdd;
       updateBoard();
       logMessage(`${name} placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
       logMessage(`${name} wins!`);
