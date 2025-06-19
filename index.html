@@ -141,6 +141,7 @@
       playerElementIndex = 0;  
       seedsLeft = 0;  
       gameEnded = false;  
+      playerTurn = true; 
       document.getElementById("log").innerHTML = "";  
       updateBoard();  
     }  
@@ -238,10 +239,10 @@ function logMessage(message) {
   let ai = 0;
 
   function nextAI() {
-    if (ai >= aiNames.length) 
+    if (ai >= aiNames.length) {
       playerTurn = true;
       return;
-
+    }
     const name = aiNames[ai];
     const seat = aiSeats[ai];
 
