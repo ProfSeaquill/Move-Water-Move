@@ -104,7 +104,13 @@
     let playerElementIndex = 2;  
     let seedsLeft = 0;  
     let gameEnded = false;  
-  
+
+    function getOwnerByElement(elementIndex) {
+      if (elementIndex === playerElementIndex) return "You";
+        else if (elementIndex === (playerElementIndex + 1) % 3) return "Obasa";
+        else if (elementIndex === (playerElementIndex + 2) % 3) return "Osi";
+  }
+
     function updateBoard() {  
      const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];  
   
@@ -193,18 +199,18 @@ function logMessage(message) {
         seedsLeft--;  
         updateBoard();  
   
-        for (let i = 0; i < 3; i++) {  
-          if (elementSeeds[i] >= 21) {  
-            if (i === (playerIndex + 2) % 3) {  
-              logMessage("You win!");  
-            } else {  
-              const winner = i === 0 ? "You" : i === 1 ? "Obasa" : "Osi";  
-              logMessage(`${winner} wins!`);  
-            }  
-            gameEnded = true;  
-            return;  
-          }  
-        }  
+        for (let i = 0; i < 3; i++) {
+          if (elementSeeds[i] >= 21) {
+            const winner = getOwnerByElement(i);
+          if (winner === "You") {
+            logMessage("You win!");
+          } else {
+            logMessage(`${winner} wins!`);
+          }
+          gameEnded = true;
+        return;
+      }
+    }
   
   
         if (seedsLeft === 0) {  
@@ -312,8 +318,12 @@ function logMessage(message) {
         // Check if anyone wins after distribution
         for (let i = 0; i < 3; i++) {
           if (elementSeeds[i] >= 21) {
-            const winner = i === (playerElementIndex + 2) % 3 ? "You" : elements[i];
-            logMessage(`${winner === "You" ? "You win!" : `${winner} wins!`}`);
+            const winner = getOwnerByElement(i);
+            if (winner === "You") {
+              logMessage("You win!");
+            } else {
+              logMessage(`${winner} wins!`);
+            }
             gameEnded = true;
             return;
           }
