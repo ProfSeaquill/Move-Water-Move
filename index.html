@@ -235,7 +235,7 @@ function aiTurn() {
     
     // Get the AI's element (relative to current player)
     const elementIndex = (playerElementIndex - aiIndex + 3) % 3;
-    const bowlIndex = elementToBowlIndex(elementIndex); // ✅ Convert to correct bowl
+    const bowlIndex = (playerIndex + elementIndex - aiIndex + 3) % 3;
 
     const roll = Math.floor(Math.random() * 6) + 1;
     logMessage(`${name} rolled a ${roll}`);
@@ -260,14 +260,14 @@ function aiTurn() {
       return;
     }
 
-    let added = [0, 0, 0]; // tracks how many seeds go to each element
-    while (toAdd > 0) {
-      const randomElement = Math.floor(Math.random() * 3);
-      const targetBowl = elementToBowlIndex(randomElement);
-      bowls[targetBowl]++;
-      added[randomElement]++;
-      toAdd--;
-    }
+    let added = [0, 0, 0];
+while (toAdd > 0) {
+  const elementIdx = Math.floor(Math.random() * 3); // Pick a random element: 0 = Rain, 1 = River, 2 = Clouds
+  const bowlIdx = (playerIndex + elementIdx - aiIndex + 3) % 3; // Adjust mapping from AI's POV to board layout
+  bowls[bowlIdx]++; // Add seed to correct bowl
+  added[elementIdx]++; // Track how many seeds went into each element
+  toAdd--;
+}
 
     for (let i = 0; i < 3; i++) {
       if (added[i]) {
