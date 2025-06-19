@@ -163,9 +163,6 @@ function logMessage(message) {
   }, 30);  
 }  
   
-function elementToBowlIndex(elementIndex) {  
-  return (playerIndex + elementIndex) % 3;  
-}  
     function rollDice() {  
       if (seedsLeft > 0 || gameEnded) return;  
   
@@ -257,7 +254,7 @@ function elementToBowlIndex(elementIndex) {
     let toAdd = roll;
 
     // Try to win
-    if (elementSeeds[elementIndex] + toAdd === 21) {
+    if (elementSeeds[elementInFrontOfAI] + toAdd === 21) {
       elementSeeds[elementIndex] += toAdd;
       updateBoard();
       logMessage(`${name} placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
@@ -270,8 +267,7 @@ function elementToBowlIndex(elementIndex) {
     let added = [0, 0, 0];
     while (toAdd > 0) {
       const randElement = Math.floor(Math.random() * 3);
-      const bowlIdx = (playerIndex + randElement) % 3;
-      bowls[bowlIdx]++;
+      elementSeeds[randElement]++;
       added[randElement]++;
       toAdd--;
     }
@@ -283,7 +279,7 @@ function elementToBowlIndex(elementIndex) {
     }
 
     updateBoard();
-    if (elementSeeds[elementIndex] >= 21) {
+    if (elementSeeds[elementInFrontOfAI] >= 21) {
       logMessage(`${name} wins!`);
       gameEnded = true;
       return;
