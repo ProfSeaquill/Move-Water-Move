@@ -279,15 +279,25 @@ function logMessage(message) {
     }
 
     updateBoard();
-    if (elementSeeds[elementInFrontOfAI] >= 21) {
-      logMessage(`${name} wins!`);
-      gameEnded = true;
-      return;
+    for (let i = 0; i < 3; i++) {
+  if (elementSeeds[i] >= 21) {
+    // Who currently controls this element?
+    if (i === playerElementIndex) {
+      logMessage("You win!");
+    } else {
+      // Figure out who has this element based on rotation
+      const owner = (playerIndex + 3 - i) % 3;
+      const winnerName = owner === 1 ? "Obasa" : owner === 2 ? "Osi" : "You";
+      logMessage(`${winnerName} wins!`);
     }
-
-    ai++;
-    setTimeout(nextAI, 3000);
+    gameEnded = true;
+    return;
   }
+}
+
+ai++;
+setTimeout(nextAI, 3000);
+}
 
   nextAI();
 }
