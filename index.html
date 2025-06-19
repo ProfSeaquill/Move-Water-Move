@@ -99,7 +99,7 @@
   </div>    <script>  
     const emojis = ["🌧️", "🌊", "☁️"];  
     const elements = ["Rain", "River", "Clouds"];  
-    let bowls = [0, 0, 0];  
+    let elementSeeds = [0, 0, 0]; // index 0: Rain, 1: River, 2: Clouds 
     let playerIndex = 0; // middle bowl  
     let playerElementIndex = 2;  
     let seedsLeft = 0;  
@@ -114,8 +114,10 @@
         const countEl = document.getElementById(`count${i+1}`);  
         const bowlEl = document.getElementById(`bowl${i+1}`);  
   
-        emojiEl.textContent = emojis[(playerElementIndex - logical + 3) % 3];  
-        countEl.textContent = bowls[logical];  
+        const elementAtThisBowl = (playerElementIndex - logical + 3) % 3;
+
+        emojiEl.textContent = emojis[elementAtThisBowl];  
+        countEl.textContent = elementSeeds[elementAtThisBowl];  
         bowlEl.classList.toggle("highlight", logical === playerIndex);  
       }  
       document.getElementById("playerElement").textContent = elements[playerElementIndex];  
@@ -189,13 +191,13 @@ function elementToBowlIndex(elementIndex) {
         const visualToLogical = [playerIndex, (playerIndex + 2) % 3, (playerIndex + 1) % 3];  
         const logicalIndex = visualToLogical[idx];  
   
-        bowls[logicalIndex]++;  
-        seedsLeft--;  
+        const elementIdx = (playerElementIndex - logicalIndex + 3) % 3;
+        elementSeeds[elementIdx]++;
           
         updateBoard();  
   
         for (let i = 0; i < 3; i++) {  
-          if (bowls[i] >= 21) {  
+          if (elementSeeds[i] >= 21) {  
             if (i === (playerIndex + 2) % 3) {  
               logMessage("You win!");  
             } else {  
@@ -255,8 +257,8 @@ function elementToBowlIndex(elementIndex) {
     let toAdd = roll;
 
     // Try to win
-    if (bowls[targetBowl] + toAdd === 21) {
-      bowls[targetBowl] += toAdd;
+    if (elementSeeds[elementIndex] + toAdd === 21) {
+      elementSeeds[elementIndex] += toAdd;
       updateBoard();
       logMessage(`${name} placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
       logMessage(`${name} wins!`);
@@ -281,7 +283,7 @@ function elementToBowlIndex(elementIndex) {
     }
 
     updateBoard();
-    if (bowls[targetBowl] >= 21) {
+    if (elementSeeds[elementIndex] >= 21) {
       logMessage(`${name} wins!`);
       gameEnded = true;
       return;
