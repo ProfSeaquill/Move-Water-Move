@@ -97,11 +97,11 @@
     <p>Roll the dice. Add that many seeds to any bowl—yours or an opponent’s. If you roll a 1, your turn ends and the board rotates, shifting your element. The first to reach 21 seeds in their current element wins.</p>  
     <button onclick="toggleHowToPlay()">Close</button>  
   </div>    <script>  
-    const emojis = ["🌧️", "🌊", "☁️"];  
-    const elements = ["Rain", "River", "Clouds"];  
+    const emojis = ["🌊", "☁️", "🌧️"];  
+    const elements = ["River", "Clouds", "Rain"];  
     let elementSeeds = [0, 0, 0]; // index 0: Rain, 1: River, 2: Clouds 
     let playerIndex = 0; // middle bowl  
-    let playerElementIndex = 2;  
+    let playerElementIndex = 0;  
     let seedsLeft = 0;  
     let gameEnded = false;  
 
