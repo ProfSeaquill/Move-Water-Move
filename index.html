@@ -238,10 +238,9 @@ function aiTurn() {
     const bowlIndex = elementToBowlIndex(elementIndex); // ✅ Convert to correct bowl
 
     const roll = Math.floor(Math.random() * 6) + 1;
-    logMessage(`${name} rolls ${roll}`);
+    logMessage(`${name} rolled a ${roll}`);
 
     if (roll === 1) {
-      logMessage(`${name} rolled a 1`);
       rotatePlayer();
       setTimeout(() => {
         if (++ai < aiIndices.length) nextAI();
