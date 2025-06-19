@@ -39,8 +39,8 @@
   margin-top: 4px;  
 }  
 #bowl1 { bottom: 0; left: 50%; transform: translateX(-50%); }  
-#bowl2 { top: 0; right: 15px; }  
-#bowl3 { top: 0; left: 15px; }  
+#bowl2 { top: 0; right: 20px; }  
+#bowl3 { top: 0; left: 20px; }  
 .controls {  
   margin: 20px;  
 }  
@@ -171,7 +171,7 @@ function logMessage(message) {
   
       if (roll === 1) {  
         rotatePlayer();  
-        setTimeout(aiTurn, 2500); // move to AI  
+        setTimeout(aiTurn, 3000); // move to AI  
         return;  
       }  
   
@@ -247,7 +247,7 @@ function logMessage(message) {
       setTimeout(() => {
         ai++;
         nextAI();
-      }, 2500);
+      }, 3000);
       return;
     }
 
@@ -286,7 +286,7 @@ function logMessage(message) {
     }
 
     ai++;
-    setTimeout(nextAI, 1000);
+    setTimeout(nextAI, 3000);
   }
 
   nextAI();
