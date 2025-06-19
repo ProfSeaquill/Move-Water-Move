@@ -172,7 +172,7 @@ function elementToBowlIndex(elementIndex) {
   
       if (roll === 1) {  
         rotatePlayer();  
-        setTimeout(aiTurn, 1000); // move to AI  
+        setTimeout(aiTurn, 2500); // move to AI  
         return;  
       }  
   
@@ -209,7 +209,7 @@ function elementToBowlIndex(elementIndex) {
   
   
         if (seedsLeft === 0) {  
-          setTimeout(aiTurn, 1000);  
+          setTimeout(aiTurn, 2500);  
         }  
       });  
     });  
@@ -286,7 +286,7 @@ function aiTurn() {
     }
 
     if (++ai < aiIndices.length) {
-      setTimeout(nextAI, 1000);
+      setTimeout(nextAI, 2500);
     }
   }
 
