@@ -220,54 +220,60 @@ function elementToBowlIndex(elementIndex) {
       logMessage(`**You now control the ${elements[playerElementIndex]}**`);  
     }  
 
-function aiTurn() {
+
+  function aiTurn() {
   if (gameEnded) return;
 
   const aiNames = ["Osi", "Obasa"];
-  const aiIndices = [2, 0];
+  const aiSeats = [2, 1]; // Osi looks at bowl index 2, Obasa at 1 (fixed positions)
 
   let ai = 0;
   function nextAI() {
-    if (ai >= aiIndices.length) return;
+    if (ai >= aiNames.length) return;
 
-    const aiIndex = aiIndices[ai];
     const name = aiNames[ai];
-    
-    // Get the AI's element (relative to current player)
-    const elementIndex = (playerElementIndex - aiIndex + 3) % 3;
-    const bowlIndex = (playerIndex + elementIndex - aiIndex + 3) % 3;
+    const seat = aiSeats[ai]; // their fixed seat index
+
+    // Find the element currently sitting in front of this AI (based on player rotation)
+    const elementInFrontOfAI = (playerElementIndex - seat + 3) % 3;
+
+    // From the player's perspective, this element is now at this bowl index:
+    const targetBowl = (playerIndex + elementInFrontOfAI) % 3;
 
     const roll = Math.floor(Math.random() * 6) + 1;
-    logMessage(`${name} rolled a ${roll}`);
+    logMessage(`${name} rolls ${roll}`);
 
     if (roll === 1) {
+      logMessage(`${name} rolled a 1`);
       rotatePlayer();
       setTimeout(() => {
-        if (++ai < aiIndices.length) nextAI();
+        ai++;
+        nextAI();
       }, 2500);
       return;
     }
 
     let toAdd = roll;
 
-    // ✅ Win check must use the bowlIndex, not elementIndex
-    if (bowls[bowlIndex] + toAdd === 21) {
-      bowls[bowlIndex] += toAdd;
-      logMessage(`${name} placed ${toAdd} seeds in the ${elements[elementIndex]}`);
+    // Try to win
+    if (bowls[targetBowl] + toAdd === 21) {
+      bowls[targetBowl] += toAdd;
       updateBoard();
+      logMessage(`${name} placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
       logMessage(`${name} wins!`);
       gameEnded = true;
       return;
     }
 
+    // Otherwise, random but aligned placement
     let added = [0, 0, 0];
-while (toAdd > 0) {
-  const elementIndex = Math.floor(Math.random() * 3); // Pick a random element: 0 = Rain, 1 = River, 2 = Clouds
-  const bowlIndex = (playerIndex + elementIndex - aiIndex + 3) % 3; // Adjust mapping from AI's POV to board layout
-  bowls[bowlIndex]++; // Add seed to correct bowl
-  added[elementIndex]++; // Track how many seeds went into each element
-  toAdd--;
-}
+    while (toAdd > 0) {
+      const randElement = Math.floor(Math.random() * 3);
+      const bowlIdx = (playerIndex + randElement) % 3;
+      bowls[bowlIdx]++;
+      added[randElement]++;
+      toAdd--;
+    }
 
     for (let i = 0; i < 3; i++) {
       if (added[i]) {
@@ -276,22 +282,18 @@ while (toAdd > 0) {
     }
 
     updateBoard();
-
-    // ✅ Again, check the bowlIndex
-    if (bowls[bowlIndex] >= 21) {
+    if (bowls[targetBowl] >= 21) {
       logMessage(`${name} wins!`);
       gameEnded = true;
       return;
     }
 
-    if (++ai < aiIndices.length) {
-      setTimeout(nextAI, 2500);
-    }
+    ai++;
+    setTimeout(nextAI, 1000);
   }
 
   nextAI();
 }
-  
     restartGame();  
   </script>  
 </body>  
