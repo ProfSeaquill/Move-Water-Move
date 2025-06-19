@@ -338,8 +338,13 @@ function logMessage(message) {
     }
 
     ai++;
-    setTimeout(nextAI, 3000);
-  }
+    if (ai >= aiNames.length) {
+      setTimeout(() => {
+        playerTurn = true;
+      }, 500); // Delay before player can go
+    } else {
+      setTimeout(nextAI, 3500); // Delay between Obasa and Osi
+    }
 
   nextAI();
 }
