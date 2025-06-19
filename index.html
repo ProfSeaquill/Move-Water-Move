@@ -220,23 +220,23 @@ function logMessage(message) {
     }  
 
 
-  function aiTurn() {
+ function aiTurn() {
   if (gameEnded) return;
 
   const aiNames = ["Osi", "Obasa"];
-  const aiSeats = [2, 1]; // Osi looks at bowl index 2, Obasa at 1 (fixed positions)
+  const aiSeats = [2, 1]; // Osi at seat 2, Obasa at seat 1
 
   let ai = 0;
+
   function nextAI() {
     if (ai >= aiNames.length) return;
 
     const name = aiNames[ai];
-    const seat = aiSeats[ai]; // their fixed seat index
+    const seat = aiSeats[ai];
 
-    // Find the element currently sitting in front of this AI (based on player rotation)
     const elementInFrontOfAI = (playerElementIndex - seat + 3) % 3;
-
     const roll = Math.floor(Math.random() * 6) + 1;
+
     logMessage(`${name} rolled a ${roll}`);
 
     if (roll === 1) {
@@ -249,52 +249,81 @@ function logMessage(message) {
     }
 
     let toAdd = roll;
-
-    // Try to win
-    if (elementSeeds[elementInFrontOfAI] + toAdd === 21) {
-      elementSeeds[elementInFrontofAI] += toAdd;
-      updateBoard();
-      logMessage(`${name} placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
-      logMessage(`${name} wins!`);
-      gameEnded = true;
-      return;
-    }
-
-    // Otherwise, random but aligned placement
     let added = [0, 0, 0];
-    while (toAdd > 0) {
-      const randElement = Math.floor(Math.random() * 3);
-      elementSeeds[randElement]++;
-      added[randElement]++;
-      toAdd--;
-    }
 
-    for (let i = 0; i < 3; i++) {
-      if (added[i]) {
-        logMessage(`${name} placed ${added[i]} seeds in the ${elements[i]}`);
+    if (name === "Osi") {
+      // Osi's aggressive strategy
+      for (let i = 0; i < toAdd; i++) {
+        if (gameEnded) break;
+        elementSeeds[elementInFrontOfAI]++;
+        updateBoard();
+      }
+
+      logMessage(`Osi placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
+
+      if (elementSeeds[elementInFrontOfAI] >= 21) {
+        logMessage(`Osi wins!`);
+        gameEnded = true;
+        return;
+      }
+    } else {
+      // Obasa's defensive strategy
+
+      const current = elementSeeds[elementInFrontOfAI];
+      const projected = current + toAdd;
+
+      // Estimate potential to win in 2 turns (assume next roll is max 6)
+      if (projected >= 21 || (current + 6 + toAdd) >= 21) {
+        // Try to win
+        elementSeeds[elementInFrontOfAI] += toAdd;
+        updateBoard();
+        logMessage(`Obasa placed ${toAdd} seeds in the ${elements[elementInFrontOfAI]}`);
+
+        if (elementSeeds[elementInFrontOfAI] >= 21) {
+          logMessage(`Obasa wins!`);
+          gameEnded = true;
+          return;
+        }
+      } else {
+        // Distribute seeds to balance all bowls
+        while (toAdd > 0) {
+          let min = Infinity;
+          let target = -1;
+          for (let i = 0; i < 3; i++) {
+            const projected = elementSeeds[i] + added[i];
+            if (projected < min) {
+              min = projected;
+              target = i;
+            }
+          }
+          elementSeeds[target]++;
+          added[target]++;
+          toAdd--;
+        }
+
+        for (let i = 0; i < 3; i++) {
+          if (added[i] > 0) {
+            logMessage(`Obasa placed ${added[i]} seeds in the ${elements[i]}`);
+          }
+        }
+
+        updateBoard();
+
+        // Check if anyone wins after distribution
+        for (let i = 0; i < 3; i++) {
+          if (elementSeeds[i] >= 21) {
+            const winner = i === (playerElementIndex + 2) % 3 ? "You" : elements[i];
+            logMessage(`${winner === "You" ? "You win!" : `${winner} wins!`}`);
+            gameEnded = true;
+            return;
+          }
+        }
       }
     }
 
-    updateBoard();
-    for (let i = 0; i < 3; i++) {
-  if (elementSeeds[i] >= 21) {
-    // Who currently controls this element?
-    if (i === playerElementIndex) {
-      logMessage("You win!");
-    } else {
-      // Figure out who has this element based on rotation
-      const owner = (playerIndex + 3 - i) % 3;
-      const winnerName = owner === 1 ? "Obasa" : owner === 2 ? "Osi" : "You";
-      logMessage(`${winnerName} wins!`);
-    }
-    gameEnded = true;
-    return;
+    ai++;
+    setTimeout(nextAI, 3000);
   }
-}
-
-ai++;
-setTimeout(nextAI, 3000);
-}
 
   nextAI();
 }
